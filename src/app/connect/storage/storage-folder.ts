@@ -1,4 +1,5 @@
 
+import { AngularFireUploadTask } from '@angular/fire/storage';
 import { StorageService } from './storage.service';
 import { dbCommon } from '../database/database-document';
 import { DatabaseCollection } from '../database/database-collection';
@@ -33,13 +34,13 @@ export class StorageFolder extends DatabaseCollection<dbFile> {
    * @param file the file object to be uploaded and tracked
    * @returns the TaskSnapshot observable streaming the upload progress till completion
    */
-  public upload(file: File): Observable<dbFile> {
+  public upload(file: File, medatada?: any): Observable<dbFile> {
 
     // Computes the storage path
     const storePath = `${this.path}/${this.unique(file.name)}`;
 
     // Creates the upload task
-    const task = this.store.upload(storePath, file);
+    const task = this.store.upload(storePath, file, medatada);
 
     return new Observable<dbFile>(subscriber => {
 
@@ -57,7 +58,7 @@ export class StorageFolder extends DatabaseCollection<dbFile> {
         
         error => subscriber.error(error), 
       
-        () => task.getDownloadURL().then( url => subscriber.next({...file, url }) )
+        () => task.then( snap => snap.getDownloadURL() ).then( url => subscriber.next({...file, url }) )
       );
 
       return () => sub.unsubscribe();
@@ -90,11 +91,10 @@ export class StorageFolder extends DatabaseCollection<dbFile> {
    */
   public deleteFile(name: string): Promise<void> {
 
-    const ref = this.doc(name);
-    
-    return ref(name).get().toPromise()
+    const doc = this.document(name);
+    return doc.get().toPromise()
       .then( file => this.store.ref(file.path).delete() )
-      .then( () => ref.delete() );
+      .then( () => doc.delete() );
   }
 
   /** Deletes all the file in the storage */

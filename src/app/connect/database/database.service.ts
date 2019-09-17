@@ -4,7 +4,7 @@ import { DatabaseDocument } from './database-document'
 import { DatabaseCollection } from './database-collection';
 import { PagedCollection, PageConfig } from './database-paged';
 import { DistributedCounter } from './database-counter';
-import { firestore } from 'firebase';
+import { firestore } from 'firebase/app';
 //--
 export type dbCollectionRef<T> = AngularFirestoreCollection<T>;
 export type dbDocumentRef<T> = AngularFirestoreDocument<T>;
