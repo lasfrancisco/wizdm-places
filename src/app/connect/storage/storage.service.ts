@@ -6,20 +6,13 @@ import { Observable, merge, of } from 'rxjs';
 import { switchMap, takeWhile, map, filter, take, expand } from 'rxjs/operators';
 
 @Injectable()
-export class UploaderService {
+export class StorageService {
 
   constructor(readonly db: DatabaseService, readonly st: AngularFireStorage) {}
 
   public folder(path: string, bucket: string): StorageFolder {
     return new StorageFolder(this, path, bucket);
   }
-
-  // Computes a unique name based on current date and time
-  public unique(name: string): string {
-    return `${new Date().getTime()}_${name}`;
-  }
-
-
 
   /**
    * Searches for the single file coming with the specified url

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { DatabaseModule } from '../database/database.module';
-import { UploaderService } from './uploader.service';
+import { StorageService } from './storage.service';
 
 @NgModule({
   imports: [
@@ -10,6 +10,6 @@ import { UploaderService } from './uploader.service';
     DatabaseModule,
     AngularFireStorageModule
   ],
-  providers: [ UploaderService ]
+  providers: [ StorageService ]
 })
 export class UploaderModule { }
