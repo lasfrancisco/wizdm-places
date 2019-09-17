@@ -17,5 +17,5 @@ export class StorageService {
 
   }
 
-  public list(path)
+  //public list(path)
 }

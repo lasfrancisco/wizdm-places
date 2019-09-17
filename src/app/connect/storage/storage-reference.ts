@@ -3,7 +3,7 @@ import { stSettableMetadata, stUploadMetadata } from './storage.service';
 import { storage } from 'firebase/app';
 import { Observable, from } from 'rxjs';
 
-export type stUploadTask = AngularFireUploadTask ;
+export type stUploadTask  = AngularFireUploadTask;
 export type stListOptions = storage.ListOptions;
 export type stListResult  = storage.ListResult;
 export type stReference   = storage.Reference;
@@ -17,9 +17,9 @@ export class StorageReference {
     this.ref = st.ref(path);
   }
 
-  public getDownloadURL(): Observable<any> { return this.ref.getDownloadURL(); }
+  public getDownloadURL(): Observable<string> { return this.ref.getDownloadURL(); }
 
-  public getMetadata(): Observable<any>{ return this.ref.getMetadata(); }
+  public getMetadata(): Observable<stUploadMetadata>{ return this.ref.getMetadata(); }
   
   public delete(): Observable<any>{ return this.ref.delete(); }
 
@@ -33,7 +33,7 @@ export class StorageReference {
   }
 
   public putString(data: string, format?: string, metadata?: stUploadMetadata): stUploadTask {
-    return this.ref.putString(data, metadata);
+    return this.ref.putString(data, format, metadata);
   }
 
   public list(options?: stListOptions): Observable<stListResult> {
