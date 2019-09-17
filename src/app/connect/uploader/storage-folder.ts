@@ -16,6 +16,8 @@ export interface dbFile extends dbCommon {
 
 export class StorageFolder extends DatabaseCollection<dbFile> {
 
+  get store() { return this.up.st; }
+
   constructor(readonly up: UploaderService, path: string, public bucket: string) { 
     super(up.db, path);
   }
@@ -31,7 +33,7 @@ export class StorageFolder extends DatabaseCollection<dbFile> {
         // Gets the document data
         const file = docs[0].data();
         // Deletes the file from the storage than delete the docment from the collection
-        return this.up.st.ref(file.path).delete()
+        return this.store.ref(file.path).delete()
           .pipe( 
             switchMap( () => docs[0].ref.delete() ),
             map( () => true ) 
