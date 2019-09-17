@@ -2,25 +2,15 @@ import { Injectable } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { DatabaseService } from '../database/database.service';
 import { StorageFolder } from './storage-folder';
-import { dbCommon } from '../database/database-document';
 import { Observable, merge, of } from 'rxjs';
 import { switchMap, takeWhile, map, filter, take, expand } from 'rxjs/operators';
-
-export interface wmFile  extends dbCommon {
-  name?:     string,
-  fullName?: string,
-  path?:     string,
-  size?:     number,
-  url?:      string,
-  xfer?:     number // bytes transferred during the upload
-}
 
 @Injectable()
 export class UploaderService {
 
   constructor(readonly db: DatabaseService, readonly st: AngularFireStorage) {}
 
-  public folder(path: string, bucket: string) {
+  public folder(path: string, bucket: string): StorageFolder {
     return new StorageFolder(this, path, bucket);
   }
 
@@ -124,48 +114,5 @@ export class UploaderService {
    *
   public uploadOnce(file: File): Promise<wmFile> {
     return this.upload(file).toPromise();
-  }*/
-
-  /**
-   * Deletes a user uploaded file clearing up both the storage and the database document
-   * @param id the file id
-   *
-  public delete(id: string): Promise<void> {
-    
-    const doc = this.document(id);
-    return doc.get().toPromise()
-      .then( file => this.st.ref(file.path).delete() )
-      .then( () => doc.delete() );
-  }
-
-  // Helper to delete stored files once at a time
-  private deleteNext(): Observable<boolean> {
-    // Gets a snapshot of 1 document in the collection
-    return this.col(ref => ref.limit(1)).get()
-      .pipe( switchMap( snap => {
-        // Once there are no more documents in the snapshow we're done
-        const docs = snap.docs;
-        if(docs.length === 0) { return of(false); }
-        // Gets the document data
-        const file = docs[0].data();
-        // Deletes the file from the storage than delete the docment from the collection
-        return this.st.ref(file.path).delete()
-          .pipe( 
-            switchMap( () => docs[0].ref.delete() ),
-            map( () => true ) 
-          );
-      }));
-  }*/
-
-  /**
-   * Deletes all the file in the storage
-   *
-  public deleteAll(): Promise<void> {
-
-    // Starts a deletion process recursively
-    return of(true).pipe(
-      expand(() => this.deleteNext() ),
-      takeWhile( next => next )
-    ).toPromise().then( () => {} );
   }*/
 }

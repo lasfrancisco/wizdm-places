@@ -1,7 +1,16 @@
-import { StorageFolder, dbFile } from './storage-folder';
-import { DatabaseDocument } from '../database/database-document';
+import { StorageFolder } from './storage-folder';
+import { DatabaseDocument, dbCommon } from '../database/database-document';
 import { Observable, merge, of } from 'rxjs';
 import { switchMap, takeWhile, map, filter, take, expand } from 'rxjs/operators';
+
+export interface dbFile extends dbCommon {
+  name?:     string,
+  fullName?: string,
+  path?:     string,
+  size?:     number,
+  url?:      string,
+  xfer?:     number // bytes transferred during the upload
+}
 
 export class StorageFile extends DatabaseDocument<dbFile> {
 

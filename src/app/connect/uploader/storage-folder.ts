@@ -1,18 +1,9 @@
 
 import { UploaderService } from './uploader.service';
 import { DatabaseCollection } from '../database/database-collection';
-import { dbCommon } from '../database/database-document';
+import { StorageFile, dbFile } from './storage-file';
 import { Observable, merge, of } from 'rxjs';
 import { switchMap, takeWhile, map, filter, take, expand } from 'rxjs/operators';
-
-export interface dbFile extends dbCommon {
-  name?:     string,
-  fullName?: string,
-  path?:     string,
-  size?:     number,
-  url?:      string,
-  xfer?:     number // bytes transferred during the upload
-}
 
 export class StorageFolder extends DatabaseCollection<dbFile> {
 
@@ -20,6 +11,10 @@ export class StorageFolder extends DatabaseCollection<dbFile> {
 
   constructor(readonly up: UploaderService, path: string, public bucket: string) { 
     super(up.db, path);
+  }
+
+  public file(name: string): StorageFile {
+    return new StorageFile(this, name);
   }
 
    // Helper to delete stored files once at a time
