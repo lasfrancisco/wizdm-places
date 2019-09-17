@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { DatabaseService } from '../database/database.service';
-import { DatabaseCollection } from '../database/database-collection';
+import { StorageFolder } from './storage-folder';
 import { dbCommon } from '../database/database-document';
 import { Observable, merge, of } from 'rxjs';
 import { switchMap, takeWhile, map, filter, take, expand } from 'rxjs/operators';
@@ -16,57 +16,50 @@ export interface wmFile  extends dbCommon {
 }
 
 @Injectable()
-export class UploaderService extends DatabaseCollection<wmFile> {
+export class UploaderService {
 
-  public folder: string;
+  constructor(readonly db: DatabaseService, readonly st: AngularFireStorage) {}
 
-  constructor(db: DatabaseService, private st: AngularFireStorage) { 
-    super(db, '');
+  public folder(path: string, bucket: string) {
+    return new StorageFolder(this, path, bucket);
   }
 
-  /**
-   * Initialize the uploader
-   * @param path the path of the database collection for wmFile(s)
-   * @param folder the folder's name within the storage bucket
-   */
-  public init(path: string, folder: string): DatabaseCollection<wmFile> {
-    this.path = path;
-    this.folder = folder;
-    return this;
+  // Computes a unique name based on current date and time
+  public unique(name: string): string {
+    return `${new Date().getTime()}_${name}`;
   }
+
+
 
   /**
    * Searches for the single file coming with the specified url
    * @param url the url of the file to be searched for
    * @returns a Promise of the requeste wmFile
-   */
+   *
   public getByUrl(url: string): Promise<wmFile> {
     return this.get(ref => ref.where('url', '==', url) )
       .toPromise()
       .then( files => files[0] );
-  }
+  }*/
 
   /**
    * Searches for the single file coming with the specified url
    * and stream it (aka realtime support) into an observable.
    * @param url the url of the file to be searched for
    * @returns an Observable of the requeste wmFile
-   */
+   *
   public streamByUrl(url: string): Observable<wmFile> {
     return this.stream(ref => ref.where('url', '==', url) )
       .pipe( map( files => files[0] ) )
-  }
+  }*/
 
-  // Computes a unique name based on current date and time
-  protected unique(name: string): string {
-    return `${new Date().getTime()}_${name}`;
-  }
+
 
   /**
    * Uploads a file storing the content into the given folder and traking the wmFile in the given database collection
    * @param file the file object to be uploaded and tracked
    * @returns the TaskSnapshot observable streaming the upload progress till completion
-   */
+   *
   public upload(file: File): Observable<wmFile> {
 
     // Computes the storage path
@@ -122,21 +115,21 @@ export class UploaderService extends DatabaseCollection<wmFile> {
         take(1)
       )
     );
-  }
+  }*/
 
   /**
    * Simplified version of upload() executing the upload once
    * @param file file object to be uploaded
    * @returns a promise resolving to the wmFile
-   */
+   *
   public uploadOnce(file: File): Promise<wmFile> {
     return this.upload(file).toPromise();
-  }
+  }*/
 
   /**
    * Deletes a user uploaded file clearing up both the storage and the database document
    * @param id the file id
-   */
+   *
   public delete(id: string): Promise<void> {
     
     const doc = this.document(id);
@@ -162,11 +155,11 @@ export class UploaderService extends DatabaseCollection<wmFile> {
             map( () => true ) 
           );
       }));
-  }
+  }*/
 
   /**
    * Deletes all the file in the storage
-   */
+   *
   public deleteAll(): Promise<void> {
 
     // Starts a deletion process recursively
@@ -174,5 +167,5 @@ export class UploaderService extends DatabaseCollection<wmFile> {
       expand(() => this.deleteNext() ),
       takeWhile( next => next )
     ).toPromise().then( () => {} );
-  }
+  }*/
 }

@@ -1,0 +1,51 @@
+
+import { UploaderService } from './uploader.service';
+import { DatabaseCollection } from '../database/database-collection';
+import { dbCommon } from '../database/database-document';
+import { Observable, merge, of } from 'rxjs';
+import { switchMap, takeWhile, map, filter, take, expand } from 'rxjs/operators';
+
+export interface dbFile extends dbCommon {
+  name?:     string,
+  fullName?: string,
+  path?:     string,
+  size?:     number,
+  url?:      string,
+  xfer?:     number // bytes transferred during the upload
+}
+
+export class StorageFolder extends DatabaseCollection<dbFile> {
+
+  constructor(readonly up: UploaderService, path: string, public bucket: string) { 
+    super(up.db, path);
+  }
+
+   // Helper to delete stored files once at a time
+  private deleteNext(): Observable<boolean> {
+    // Gets a snapshot of 1 document in the collection
+    return this.col(ref => ref.limit(1)).get()
+      .pipe( switchMap( snap => {
+        // Once there are no more documents in the snapshow we're done
+        const docs = snap.docs;
+        if(docs.length === 0) { return of(false); }
+        // Gets the document data
+        const file = docs[0].data();
+        // Deletes the file from the storage than delete the docment from the collection
+        return this.up.st.ref(file.path).delete()
+          .pipe( 
+            switchMap( () => docs[0].ref.delete() ),
+            map( () => true ) 
+          );
+      }));
+  }
+
+  /** Deletes all the file in the storage */
+  public deleteAll(): Promise<void> {
+
+    // Starts a deletion process recursively
+    return of(true).pipe(
+      expand(() => this.deleteNext() ),
+      takeWhile( next => next )
+    ).toPromise().then( () => {} );
+  }
+}
