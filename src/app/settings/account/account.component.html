@@ -1,0 +1,37 @@
+
+<form [formGroup]="form" (ngSubmit)="save()">
+
+  <!-- Name -->
+  <!--mat-form-field appearance="outline">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" cdkFocusInitial>
+    <mat-hint>How do we call you</mat-hint>
+    <mat-error *ngIf="form.controls.name.errors?.required">
+      Please specify your name here
+    </mat-error>
+  </mat-form-field-->
+
+  <!-- Email -->
+  <!--mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email">
+    <mat-hint> We'll keep you posted here</mat-hint>
+    <mat-error *ngIf="form.controls.email.errors?.required">
+      Please specify an email address
+    </mat-error>
+    <mat-error *ngIf="form.controls.email.errors?.email">
+      Ooops! it looks like this is not a valid email
+    </mat-error>
+  </mat-form-field-->
+
+  <!-- Message -->
+  <!--mat-form-field appearance="outline">
+    <mat-label>Message</mat-label>
+    <textarea matInput formControlName="bio" cdkTextareaAutosize cdkAutosizeMinRows="3"></textarea>
+    <mat-hint>Let us know your opinion</mat-hint>
+    <mat-error *ngIf="form.controls.bio.errors?.required">
+      Please explain yourself here
+    </mat-error>
+  </mat-form-field-->
+
+</form>

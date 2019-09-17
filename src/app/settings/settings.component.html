@@ -1,0 +1,27 @@
+
+<section class="margins" fxLayout="row" fxFlex="80" fxFlexOffset="10">
+
+  <mat-nav-list class="margins">
+
+    <a mat-list-item routerLink="profile" routerLinkActive="active">
+      Profile
+    </a>
+    
+    <a mat-list-item routerLink="account" routerLinkActive="active">
+      Account
+    </a>
+
+    <a mat-list-item (click)="auth.disconnect()">
+      SignOut
+    </a>
+
+  </mat-nav-list>
+
+  <mat-divider [vertical]="true"></mat-divider>
+
+  <div class="margins">
+    <router-outlet></router-outlet>
+  </div>
+
+</section>
+

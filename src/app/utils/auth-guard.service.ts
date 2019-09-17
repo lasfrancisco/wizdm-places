@@ -1,0 +1,45 @@
+import { Injectable } from '@angular/core';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Observable, of, forkJoin, Subject } from 'rxjs';
+import { flatMap, filter, first, map, tap, zip, catchError } from 'rxjs/operators';
+import { LoginComponent, loginAction } from '../login/login.component';
+import { AuthService, User } from '../connect';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+
+  constructor(readonly auth: AuthService, private router: Router, private dialog: MatDialog) {}
+
+  get authenticated() { return this.auth.authenticated; }
+
+  get userId() { return this.auth.userId; }
+
+  public ensure() { return this.authenticate().pipe( filter( user => !!user ) ); }
+
+  public authenticate(data: loginAction = 'signIn'): Observable<User> {
+
+    if(this.auth.authenticated) { return of(this.auth.user); }
+
+    return this.dialog.open<LoginComponent,loginAction, User>(LoginComponent, { data })
+      .afterClosed();
+  }
+
+  public disconnect(jumpTo = '/') {
+    return this.auth.signOut()
+      .then( () => this.router.navigateByUrl(jumpTo) );
+  }
+
+  // Implements single route user authentication guarding
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+
+    // Gets the authorization mode when specified
+    const mode = route.queryParamMap.get('authMode') || 'signIn';
+
+    // Prompts the user for authentication 
+    return this.authenticate(mode as loginAction)
+      .pipe( map( user => !!user ) );
+  }
+}

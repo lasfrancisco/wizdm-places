@@ -1,0 +1,46 @@
+<mat-toolbar fxFlex="0 0 auto" fxLayout="row" fxLayoutAlign="space-between center">
+
+  <button mat-icon-button routerLink="/">
+    <mat-icon>home</mat-icon>
+  </button>
+
+  <div fxLayout="row" fxLayoutAlign="end center" *ngIf="authenticated; else signIn">
+
+    <span>Welcome {{ (userName$ | async) || 'to Places!' }}</span>
+
+    <button mat-icon-button routerLink="settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+    
+  </div>
+
+  <ng-template #signIn>
+
+    <button mat-icon-button (click)="guard.authenticate()">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+
+  </ng-template>
+
+</mat-toolbar>
+
+<mat-divider></mat-divider>
+
+<main fxFlex="1 1 auto" fxLayout="column">
+    
+  <div fxFlex="1 1 auto">
+    <router-outlet></router-outlet>
+  </div>
+  
+  <mat-divider></mat-divider>
+
+  <footer fxFlex="0 0 auto"  fxLayout="row" fxLayoutAlign="center center">
+    
+    <a mat-icon-button *ngFor="let item of footerItems" [href]="item.link" target="_blank">
+      <mat-icon [fontSet]="item.icon.split(':')[0]" [fontIcon]="item.icon.split(':')[1]">
+      </mat-icon>
+    </a>
+  
+  </footer>
+  
+</main>

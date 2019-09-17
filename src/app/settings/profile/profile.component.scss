@@ -1,0 +1,27 @@
+
+:host {
+  display: flex;
+  flex-flow: row;
+  align-items: flex-start;
+  position: relative;
+
+  form { width: 250px; }
+  
+  .avatar {
+
+    margin-left: 16px;
+
+    .picture { position: relative; }
+
+    .edit {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+    }
+
+    fill: lightgray;
+
+    width: 200px;
+    height: 200px;
+  }
+}

@@ -1,0 +1,9 @@
+
+<button mat-button class="likes" (click)="toggleFavorite()">
+
+  <span class="mat-small" *ngIf="likes.counter$ | async as counter">{{ counter }}</span>
+  <mat-icon [@beat]="likes.counter$ | async">{{ (favorite$ | async) ? 'favorite' : 'favorite_border' }}</mat-icon>
+
+</button>
+
+<span class="name">{{ name }}</span>
