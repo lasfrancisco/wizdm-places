@@ -11,17 +11,12 @@
 
     margin-left: 16px;
 
-    .picture { 
-      
-      position: relative;
-
-      
-    }
+    .picture { position: relative; }
 
     .edit {
       position: absolute;
-      left: 0px;
-      bottom: 0px;
+      right: 0px;
+      top: 0px;
     }
 
     fill: lightgray;

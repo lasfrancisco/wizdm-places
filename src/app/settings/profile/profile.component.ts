@@ -71,6 +71,18 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       .then( () => this.form.markAsPristine() );
   }
 
+  public uploadPhoto(file: File) {
+
+    if(!file) { return; }
+
+    // Uploads the file
+    this.storage.upload(`${this.id}/${file.name}`, file)
+      // Gets the url
+      .then( snap => snap.ref.getDownloadURL() ) 
+      // Updates the profile with the new url
+      .then( photo => this.update({ photo }) );
+  }
+
   private deletePhoto(): Promise<void> {
 
     // Reads the profile photo url
@@ -84,19 +96,5 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       .catch( e => null )
       // Resets the photo url into the profile
       .then( () => this.update({ photo: '' }) );
-  }
-
-  public uploadPhoto(file: File) {
-
-    if(!file) { return; }
-
-    // Deletes the current photo first
-    this.deletePhoto()
-    // Uploads the new photo
-      .then( () => this.storage.upload(`${this.id}/${file.name}`, file) )
-      // Gets the url
-      .then( snap => snap.ref.getDownloadURL() ) 
-      // Updates the profile with the new url
-      .then( photo => this.update({ photo }) );
   }
 }
