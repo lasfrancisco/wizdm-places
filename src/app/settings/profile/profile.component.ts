@@ -3,6 +3,8 @@ import { AuthService, User, DatabaseService, DatabaseDocument, StorageService } 
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { dbUser } from '../../app.component';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'wm-profile',
@@ -11,6 +13,7 @@ import { dbUser } from '../../app.component';
 })
 export class ProfileComponent extends DatabaseDocument<dbUser> {
 
+  readonly photo$: Observable<string>;
   readonly form: FormGroup;
 
   get user() { return this.auth.user || {} as User };
@@ -26,8 +29,23 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       'bio'  : ['']
     });
 
+    // Loads the profile into the form once 
+    this.load().then( data => this.form.patchValue(data) ); 
+
+    // Streams the profile photo
+    this.photo$ = this.stream().pipe( map( profile => profile.photo ) );
+
+    this.storage.ref(this.id).listAll()
+      .subscribe( list => console.log(list) );
+
+    
+  }
+
+  // Loads the profile creating a default one when missing
+  public load(): Promise<dbUser> {
+
     // Checks for a profile document
-    this.exists().then( exists => {
+    return this.exists().then( exists => {
       // Whenever the profile doesn't exist...
       if(!exists) { 
         // Creates a profile from the user account object
@@ -42,19 +60,33 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       }
     })
     // Loads the profile content
-    .then( () => this.get().toPromise() )
-    // Updates the form accordingly
-    .then( data => this.form.patchValue(data) ); 
+    .then( () => this.get().toPromise() );
   }
 
   // Updates the profile
-  public save() { 
+  public save(): Promise<void> { 
 
-    this.update(this.form.value)
+    return this.update(this.form.value)
       .then( () => this.form.markAsPristine() );
   }
 
-  public upload(files: FileList) {
-    
+  public upload(file: File) {
+
+    if(!file) { return; }
+
+    this.storage.upload(`${this.id}/${file.name}`, file)
+      .then( snap => {
+
+        console.log(snap);
+
+        return snap.ref.getDownloadURL();
+
+      }) 
+      .then( photo => {
+
+        console.log(photo);
+
+        return this.update({ photo });
+      } );
   }
 }

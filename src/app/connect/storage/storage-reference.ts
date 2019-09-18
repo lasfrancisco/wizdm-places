@@ -3,8 +3,6 @@ import { stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stLis
 import { createStorageRef } from '@angular/fire/storage';
 import { FirebaseZoneScheduler } from '@angular/fire';
 import { storage } from 'firebase/app';
-//--
-export type stReference        = storage.Reference;
 import { Observable, from } from 'rxjs';
 
 /** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
