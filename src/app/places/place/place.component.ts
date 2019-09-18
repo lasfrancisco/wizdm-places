@@ -56,16 +56,12 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
 
     // Unsubscribes previous subscriptions, eventually
     if(!!this.sub) { this.sub.unsubscribe(); }
-
     // Subscribes to keeps the data in sync
     this.sub = this.syncData(data)
-    
     // Gets the likes distributed counter
     this.likes = this.counter('likes');
-
      // Gets the collection of likers
     this.likers = this.collection('likers');
-
     // Builds the favorite flag
     this.favorite$ = this.initFavorite();
   }
