@@ -1,7 +1,8 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
 import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
 import { createStorageRef } from '@angular/fire/storage';
-import { Observable, from } from 'rxjs';
+import { expand, takeWhile, switchMap } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
 
 /** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
 export class StorageReference {
@@ -53,4 +54,41 @@ export class StorageReference {
       )
     );
   }
+
+  public wipe(): Promise<void> {
+
+    // Starts a deletion process recursively
+    return of(true).pipe(
+      expand(() => this.deleteNext() ),
+      takeWhile( next => next )
+    ).toPromise().then( () => {} );
+  }
+
+ // Helper to delete stored files once at a time
+  private deleteNext(): Observable<boolean> {
+
+    return this.list({ maxResults: 1 })
+      .pipe( switchMap( res => { 
+
+        if
+
+        res.prefixes.forEach( ref => this.st.ref(ref).wipe);
+
+
+    // Gets a snapshot of 1 document in the collection
+    return this.col(ref => ref.limit(1)).get()
+      .pipe( switchMap( snap => {
+        // Once there are no more documents in the snapshow we're done
+        const docs = snap.docs;
+        if(docs.length === 0) { return of(false); }
+        // Gets the document data
+        const file = docs[0].data();
+        // Deletes the file from the storage than delete the docment from the collection
+        return this.st.ref(file.path).delete()
+          .pipe( 
+            switchMap( () => docs[0].ref.delete() ),
+            map( () => true ) 
+          );
+      }));
+  }*/
 } 

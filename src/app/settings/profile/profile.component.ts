@@ -33,10 +33,19 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     this.load().then( data => this.form.patchValue(data) ); 
 
     // Streams the profile photo
-    this.photo$ = this.stream().pipe( map( profile => profile.photo ) );
+    this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
 
-    this.storage.ref(this.id).listAll()
-      .subscribe( list => console.log(list) );    
+    this.storage.ref('').listAll()
+      .subscribe( list => {
+        /*
+        try {
+
+          list.prefixes[0].delete();
+
+        }
+        catch(e) { console.log(e); }
+*/
+      } );    
   }
 
   // Loads the profile creating a default one when missing
