@@ -1,44 +1,47 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
 import { stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
+import { createStorageRef } from '@angular/fire/storage';
+import { FirebaseZoneScheduler } from '@angular/fire';
+import { storage } from 'firebase/app';
+//--
+export type stReference        = storage.Reference;
 import { Observable, from } from 'rxjs';
 
 /** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
 export class StorageReference {
 
-  readonly ref: AngularFireStorageReference;
+  readonly inner: AngularFireStorageReference;
 
-  constructor(readonly st: AngularFireStorage, readonly path: string) { 
+  constructor(readonly ref: storage.Reference, private scheduler: FirebaseZoneScheduler) { 
 
-    this.ref = st.ref(path);
+    this.inner = createStorageRef(ref, scheduler);
   }
 
-  public getDownloadURL(): Observable<string> { return this.ref.getDownloadURL(); }
+  public getDownloadURL(): Observable<string> { return this.inner.getDownloadURL(); }
 
-  public getMetadata(): Observable<stUploadMetadata>{ return this.ref.getMetadata(); }
+  public getMetadata(): Observable<stUploadMetadata>{ return this.inner.getMetadata(); }
   
-  public delete(): Observable<any>{ return this.ref.delete(); }
+  public delete(): Observable<any>{ return this.inner.delete(); }
 
-  public child(path: string): any { return this.ref.child(path); }
+  public child(path: string): any { return this.inner.child(path); }
 
   public updateMetadata(meta: stSettableMetadata): Observable<any> 
-    { return this.ref.updateMetadata(meta); }
+    { return this.inner.updateMetadata(meta); }
 
   public put(data: any, metadata?: stUploadMetadata): stUploadTask {
-    return this.ref.put(data, metadata);
+    return this.inner.put(data, metadata);
   }
 
   public putString(data: string, format?: string, metadata?: stUploadMetadata): stUploadTask {
-    return this.ref.putString(data, format, metadata);
+    return this.inner.putString(data, format, metadata);
   }
 
   public list(options?: stListOptions): Observable<stListResult> {
 
-    const ref = this.st.storage.ref(this.path);
-
-    return this.st.scheduler.keepUnstableUntilFirst(
-      this.st.scheduler.runOutsideAngular(
-        from(this.st.scheduler.zone.runOutsideAngular(
-          () => ref.list(options)
+    return this.scheduler.keepUnstableUntilFirst(
+      this.scheduler.runOutsideAngular(
+        from(this.scheduler.zone.runOutsideAngular(
+          () => this.ref.list(options)
         ))
       )
     );
@@ -46,12 +49,10 @@ export class StorageReference {
 
   public listAll(): Observable<stListResult> {
 
-    const ref = this.st.storage.ref(this.path);
-
-    return this.st.scheduler.keepUnstableUntilFirst(
-      this.st.scheduler.runOutsideAngular(
-        from(this.st.scheduler.zone.runOutsideAngular(
-          () => ref.listAll()
+    return this.scheduler.keepUnstableUntilFirst(
+      this.scheduler.runOutsideAngular(
+        from(this.scheduler.zone.runOutsideAngular(
+          () => this.ref.listAll()
         ))
       )
     );
