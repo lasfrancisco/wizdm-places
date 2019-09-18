@@ -1,13 +1,8 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
-import { stSettableMetadata, stUploadMetadata } from './storage.service';
-import { storage } from 'firebase/app';
+import { stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
 import { Observable, from } from 'rxjs';
 
-export type stUploadTask  = AngularFireUploadTask;
-export type stListOptions = storage.ListOptions;
-export type stListResult  = storage.ListResult;
-export type stReference   = storage.Reference;
-
+/** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
 export class StorageReference {
 
   readonly ref: AngularFireStorageReference;
