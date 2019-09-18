@@ -38,9 +38,9 @@
 
   <div class="mat-small">Profile picture</div>
 
-  <div class="picture" *ngIf="(photo$ | async) as photo">
+  <div class="picture">
 
-    <img *ngIf="photo; else avatar" [src]="photo" (error)="photo = ''" style="width: 100%"/>
+    <img *ngIf="(photo$ | async) as photo; else avatar" [src]="photo" (error)="photo = ''" style="width: 100%"/>
 
     <ng-template #avatar>
 
@@ -50,7 +50,7 @@
 
     </ng-template>
 
-    <input style="display:none" type="file" accept="image/*" (change)="upload($event.target?.files?.item(0))" #openfile />
+    <input style="display:none" type="file" accept="image/*" (change)="uploadPhoto($event.target?.files?.item(0))" #openfile />
 
     <button mat-icon-button class="edit" (click)="openfile.click()">
       <mat-icon>cloud_upload</mat-icon>

@@ -3,8 +3,8 @@ import { AuthService, User, DatabaseService, DatabaseDocument, StorageService } 
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { dbUser } from '../../app.component';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, take, switchMap, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'wm-profile',
@@ -34,12 +34,12 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
     // Streams the profile photo
     this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
-
+/*
     this.storage.ref('').list().subscribe( list => {
 
       console.log(list);
 
-    });
+    });*/
   }
 
   // Loads the profile creating a default one when missing
@@ -71,23 +71,23 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       .then( () => this.form.markAsPristine() );
   }
 
-  public upload(file: File) {
+  private deletePhoto(): Promise<void> {
+
+    return this.get().toPromise()
+      .then( profile => profile.photo )
+      .then( url => this.storage.refFromURL(url) )
+      .then( ref => ref.delete() )
+      .catch( e => null )
+      .then( () => this.update({ photo: '' }) );
+  }
+
+  public uploadPhoto(file: File) {
 
     if(!file) { return; }
 
-    this.storage.upload(`${this.id}/${file.name}`, file)
-      .then( snap => {
-
-        console.log(snap);
-
-        return snap.ref.getDownloadURL();
-
-      }) 
-      .then( photo => {
-
-        console.log(photo);
-
-        return this.update({ photo }); 
-      } );
+    this.deletePhoto()
+      .then( () => this.storage.upload(`${this.id}/${file.name}`, file) )
+      .then( snap => snap.ref.getDownloadURL() ) 
+      .then( photo => this.update({ photo }) );
   }
 }

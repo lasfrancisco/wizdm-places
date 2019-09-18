@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     { icon: "fab:fa-medium", link: "https://medium.com/wizdm-genesys" }
   ];
 
-  get authenticated() { return this.guard.auth.authenticated; }
+  get authenticated() { return this.guard.authenticated; }
 
   get auth(): AuthService { return this.guard.auth; }
 

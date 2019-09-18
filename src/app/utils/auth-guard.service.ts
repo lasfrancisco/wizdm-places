@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, of, forkJoin, Subject } from 'rxjs';
-import { filter, map, take, switchMap } from 'rxjs/operators';
+import { take, switchMap } from 'rxjs/operators';
 import { LoginComponent, loginAction } from '../login/login.component';
 import { AuthService, User } from '../connect';
 
@@ -17,9 +17,7 @@ export class AuthGuard implements CanActivate {
 
   get userId() { return this.auth.userId; }
 
-  public ensure() { return this.authenticate().pipe( filter( user => !!user ) ); }
-
-  public authenticate(data: loginAction = 'signIn'): Observable<User> {
+  public authenticate(data: loginAction = 'signIn'): Promise<User> {
 
     return this.auth.user$.pipe(
       
@@ -32,10 +30,10 @@ export class AuthGuard implements CanActivate {
         return this.dialog.open<LoginComponent,loginAction, User>(LoginComponent, { data })
           .afterClosed();
       })
-    );
+    ).toPromise();
   }
 
-  public disconnect(jumpTo = '/') {
+  public disconnect(jumpTo = '/'): Promise<boolean> {
     return this.auth.signOut()
       .then( () => this.router.navigateByUrl(jumpTo) );
   }
@@ -47,6 +45,6 @@ export class AuthGuard implements CanActivate {
     const mode = route.queryParamMap.get('authMode') || 'signIn';
     // Prompts the user for authentication 
     return this.authenticate(mode as loginAction)
-      .pipe( map( user => !!user ) );
+      .then( user => !!user );
   }
 }
