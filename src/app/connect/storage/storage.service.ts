@@ -14,16 +14,18 @@ export type stUploadTask       = AngularFireUploadTask;
 /** Wraps the AngularFireStorage adding refFromURL() support */
 export class StorageService {
 
+  get storage() { return this.st.storage; }
+
   constructor(readonly st: AngularFireStorage) {}
 
   public ref(path: string): StorageReference {
 
-    return new StorageReference(this.st.storage.ref(path), this.st.scheduler);
+    return new StorageReference(this.storage.ref(path), this.st.scheduler);
   }
 
   public refFromURL(url: string): StorageReference {
 
-    return new StorageReference(this.st.storage.refFromURL(url), this.st.scheduler);
+    return new StorageReference(this.storage.refFromURL(url), this.st.scheduler);
   }
 
   public upload(path: string, data: any, metadata?: stUploadMetadata): stUploadTask { 
