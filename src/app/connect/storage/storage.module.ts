@@ -10,4 +10,4 @@ import { StorageService } from './storage.service';
   ],
   providers: [ StorageService ]
 })
-export class UploaderModule { }
+export class StorageModule { }

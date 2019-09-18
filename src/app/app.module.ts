@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatDialogModule } from '@angular/material/dialog';
-import { ConnectModule, ConnectConfig, AuthModule, DatabaseModule } from './connect';
+import { ConnectModule, ConnectConfig, AuthModule, DatabaseModule, StorageModule } from './connect';
 import { LoginModule } from './login/login.module';
 import { PlacesModule } from './places/places.module';
 import { SettingsModule } from './settings/settings.module';
@@ -54,6 +54,7 @@ const routes: Routes = [
     ConnectModule.init(config),
     AuthModule, 
     DatabaseModule,
+    StorageModule,
     LoginModule,
     PlacesModule,
     SettingsModule,
