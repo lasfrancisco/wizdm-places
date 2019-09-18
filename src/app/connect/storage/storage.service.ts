@@ -11,6 +11,7 @@ export type stSettableMetadata = storage.SettableMetadata;
 export type stUploadTask       = AngularFireUploadTask;
 
 @Injectable()
+/** Wraps the AngularFireStorage adding refFromURL() support */
 export class StorageService {
 
   constructor(readonly st: AngularFireStorage) {}

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User, DatabaseService, DatabaseDocument } from '../../connect';
+import { AuthService, User, DatabaseService, DatabaseDocument, StorageService } from '../../connect';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { dbUser } from '../../app.component';
@@ -15,7 +15,7 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
   get user() { return this.auth.user || {} as User };
 
-  constructor(private auth: AuthService, db: DatabaseService, private builder: FormBuilder) { 
+  constructor(private auth: AuthService, db: DatabaseService, private storage: StorageService, private builder: FormBuilder) { 
     super(db, 'users', auth.userId);
 
     // Builds the form controls group
@@ -52,5 +52,9 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
     this.update(this.form.value)
       .then( () => this.form.markAsPristine() );
+  }
+
+  public upload(files: FileList) {
+    
   }
 }
