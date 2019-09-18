@@ -125,24 +125,20 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
 
     // Acts immediately whenever the user is already logged-in
     if(this.authenticated) { this.updateFavorite( !this.favorite, this.me ); }
+    
     // Proceed to authenticate the user otherwise
-    else {
-      // Prompts for user authentication
-      this.guard.authenticate().pipe( 
-        // Gets the user object
-        switchMap( (user: User) => {
-          // Stops on authentication failed/aborted
-          if(!user) { return of(false); }
-          // Checks the user against the likers
-          return this.isLikedBy(user.uid).pipe( 
-            // Gets the first results and completes
-            take(1),
-            // Updates the favorite once the authentication succeeded
-            tap( favorite => this.updateFavorite( !favorite, user.uid ) )
-          )
-        })
-      // Runs the show
-      ).subscribe();
-    }
+    else { this.guard.authenticate().then( user => {
+
+      // Stops on authentication failed/aborted
+      if(!user) { return false; }
+      // Checks the user against the likers
+      return this.isLikedBy(user.uid).pipe( 
+        // Gets the first results and completes
+        take(1),
+        // Updates the favorite once the authentication succeeded
+        tap( favorite => this.updateFavorite( !favorite, user.uid ) )
+
+      ).toPromise();
+    });}
   }
 }

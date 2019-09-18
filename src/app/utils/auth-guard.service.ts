@@ -30,10 +30,12 @@ export class AuthGuard implements CanActivate {
         return this.dialog.open<LoginComponent,loginAction, User>(LoginComponent, { data })
           .afterClosed();
       })
+
     ).toPromise();
   }
 
   public disconnect(jumpTo = '/'): Promise<boolean> {
+
     return this.auth.signOut()
       .then( () => this.router.navigateByUrl(jumpTo) );
   }
