@@ -15,17 +15,22 @@ export type stUploadTask       = AngularFireUploadTask;
 export class StorageService {
 
   get storage() { return this.st.storage; }
+  get scheduler() { return this.st.scheduler; }
 
   constructor(readonly st: AngularFireStorage) {}
 
-  public ref(path: string): StorageReference {
+  public ref(path: string|stReference): StorageReference {
 
-    return new StorageReference(this.storage.ref(path), this.st.scheduler);
+    const ref = typeof path === 'string' ? this.storage.ref(path) : path;
+
+    return new StorageReference(ref, this.scheduler);
   }
 
   public refFromURL(url: string): StorageReference {
 
-    return new StorageReference(this.storage.refFromURL(url), this.st.scheduler);
+    const ref = this.storage.refFromURL(url);
+
+    return new StorageReference(ref, this.scheduler);
   }
 
   public upload(path: string, data: any, metadata?: stUploadMetadata): stUploadTask { 

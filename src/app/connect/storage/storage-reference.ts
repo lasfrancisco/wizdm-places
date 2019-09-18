@@ -1,8 +1,7 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
-import { stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
+import { stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
 import { createStorageRef } from '@angular/fire/storage';
 import { FirebaseZoneScheduler } from '@angular/fire';
-import { storage } from 'firebase/app';
 import { Observable, from } from 'rxjs';
 
 /** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
@@ -10,7 +9,7 @@ export class StorageReference {
 
   readonly inner: AngularFireStorageReference;
 
-  constructor(readonly ref: storage.Reference, private scheduler: FirebaseZoneScheduler) { 
+  constructor(readonly ref: stReference, private scheduler: FirebaseZoneScheduler) { 
 
     this.inner = createStorageRef(ref, scheduler);
   }
