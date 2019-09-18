@@ -1,10 +1,10 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
 import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
 import { createStorageRef } from '@angular/fire/storage';
-import { expand, takeWhile, switchMap } from 'rxjs/operators';
+import { map, expand, takeWhile, switchMap } from 'rxjs/operators';
 import { Observable, from, of } from 'rxjs';
 
-/** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
+/** Wraps the AngularFireStorageReference including list() and listAll() functionalities recently added to firebase API */
 export class StorageReference {
 
   readonly inner: AngularFireStorageReference;
@@ -14,16 +14,25 @@ export class StorageReference {
     this.inner = createStorageRef(ref, st.scheduler);
   }
 
-  public getDownloadURL(): Observable<string> { return this.inner.getDownloadURL(); }
+  public getDownloadURL(): Observable<string> { 
+    return this.inner.getDownloadURL(); 
+  }
 
-  public getMetadata(): Observable<stUploadMetadata>{ return this.inner.getMetadata(); }
+  public getMetadata(): Observable<stUploadMetadata>{ 
+    return this.inner.getMetadata(); 
+  }
   
-  public delete(): Observable<any>{ return this.inner.delete(); }
+  public delete(): Observable<any> { 
+    return this.inner.delete(); 
+  }
 
-  public child(path: string): any { return this.inner.child(path); }
+  public child(path: string): StorageReference { 
+    return this.st.ref( this.ref.child(path) ); 
+  }
 
-  public updateMetadata(meta: stSettableMetadata): Observable<any> 
-    { return this.inner.updateMetadata(meta); }
+  public updateMetadata(meta: stSettableMetadata): Observable<any> { 
+    return this.inner.updateMetadata(meta); 
+  }
 
   public put(data: any, metadata?: stUploadMetadata): stUploadTask {
     return this.inner.put(data, metadata);
@@ -53,42 +62,5 @@ export class StorageReference {
         ))
       )
     );
-  }
-
-  public wipe(): Promise<void> {
-
-    // Starts a deletion process recursively
-    return of(true).pipe(
-      expand(() => this.deleteNext() ),
-      takeWhile( next => next )
-    ).toPromise().then( () => {} );
-  }
-
- // Helper to delete stored files once at a time
-  private deleteNext(): Observable<boolean> {
-
-    return this.list({ maxResults: 1 })
-      .pipe( switchMap( res => { 
-
-        if
-
-        res.prefixes.forEach( ref => this.st.ref(ref).wipe);
-
-
-    // Gets a snapshot of 1 document in the collection
-    return this.col(ref => ref.limit(1)).get()
-      .pipe( switchMap( snap => {
-        // Once there are no more documents in the snapshow we're done
-        const docs = snap.docs;
-        if(docs.length === 0) { return of(false); }
-        // Gets the document data
-        const file = docs[0].data();
-        // Deletes the file from the storage than delete the docment from the collection
-        return this.st.ref(file.path).delete()
-          .pipe( 
-            switchMap( () => docs[0].ref.delete() ),
-            map( () => true ) 
-          );
-      }));
-  }*/
+  }  
 } 

@@ -35,17 +35,11 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     // Streams the profile photo
     this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
 
-    this.storage.ref('').listAll()
-      .subscribe( list => {
-        /*
-        try {
+    this.storage.ref('').list().subscribe( list => {
 
-          list.prefixes[0].delete();
+      console.log(list);
 
-        }
-        catch(e) { console.log(e); }
-*/
-      } );    
+    });
   }
 
   // Loads the profile creating a default one when missing
@@ -93,7 +87,7 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
         console.log(photo);
 
-        return this.update({ photo });
+        return this.update({ photo }); 
       } );
   }
 }
