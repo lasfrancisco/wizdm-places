@@ -23,14 +23,12 @@ export class StorageService {
 
     const ref = typeof path === 'string' ? this.storage.ref(path) : path;
 
-    return new StorageReference(ref, this.scheduler);
+    return new StorageReference(ref, this);
   }
 
   public refFromURL(url: string): StorageReference {
 
-    const ref = this.storage.refFromURL(url);
-
-    return new StorageReference(ref, this.scheduler);
+    return new StorageReference( this.storage.refFromURL(url), this);
   }
 
   public upload(path: string, data: any, metadata?: stUploadMetadata): stUploadTask { 

@@ -1,7 +1,6 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
-import { stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
+import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
 import { createStorageRef } from '@angular/fire/storage';
-import { FirebaseZoneScheduler } from '@angular/fire';
 import { Observable, from } from 'rxjs';
 
 /** Wraps the AngularFireStorageReference adding list() and listAll() functionalities */
@@ -9,9 +8,9 @@ export class StorageReference {
 
   readonly inner: AngularFireStorageReference;
 
-  constructor(readonly ref: stReference, private scheduler: FirebaseZoneScheduler) { 
+  constructor(readonly ref: stReference, readonly st: StorageService) { 
 
-    this.inner = createStorageRef(ref, scheduler);
+    this.inner = createStorageRef(ref, st.scheduler);
   }
 
   public getDownloadURL(): Observable<string> { return this.inner.getDownloadURL(); }
@@ -35,9 +34,9 @@ export class StorageReference {
 
   public list(options?: stListOptions): Observable<stListResult> {
 
-    return this.scheduler.keepUnstableUntilFirst(
-      this.scheduler.runOutsideAngular(
-        from(this.scheduler.zone.runOutsideAngular(
+    return this.st.scheduler.keepUnstableUntilFirst(
+      this.st.scheduler.runOutsideAngular(
+        from(this.st.scheduler.zone.runOutsideAngular(
           () => this.ref.list(options)
         ))
       )
@@ -46,9 +45,9 @@ export class StorageReference {
 
   public listAll(): Observable<stListResult> {
 
-    return this.scheduler.keepUnstableUntilFirst(
-      this.scheduler.runOutsideAngular(
-        from(this.scheduler.zone.runOutsideAngular(
+    return this.st.scheduler.keepUnstableUntilFirst(
+      this.st.scheduler.runOutsideAngular(
+        from(this.st.scheduler.zone.runOutsideAngular(
           () => this.ref.listAll()
         ))
       )

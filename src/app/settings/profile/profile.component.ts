@@ -36,9 +36,7 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     this.photo$ = this.stream().pipe( map( profile => profile.photo ) );
 
     this.storage.ref(this.id).listAll()
-      .subscribe( list => console.log(list) );
-
-    
+      .subscribe( list => console.log(list) );    
   }
 
   // Loads the profile creating a default one when missing
