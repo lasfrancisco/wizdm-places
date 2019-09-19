@@ -37,7 +37,7 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
     //this.storage.ref('lucio.jpg').getDownloadURL().subscribe( url => console.log(url) );
 
-    this.storage.ref('').list().then( result => console.log(result) );
+    //this.storage.ref('').list().then( result => console.log(result) );
 
     this.files = storage.ref('').list();
   }
