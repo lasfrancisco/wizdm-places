@@ -3,22 +3,18 @@ import { DatabaseDocument, dbCommon } from './database-document';
 import { Observable, of, from } from 'rxjs';
 import { map, mergeMap, expand, takeWhile } from 'rxjs/operators';
 
-/**
- * Collection object in the database, created by the DatabaseService
- */
+/** Collection object in the database, created by the DatabaseService */
 export class DatabaseCollection<T extends dbCommon> {
 
   constructor(readonly db: DatabaseService, public path: string) { }
 
-  /**
-   * Helper returing the collection reference for internal use
-   */
+  /** Helper returing the collection reference for internal use */
   public col(sf?: dbStreamFn): dbCollectionRef<T> {
     return this.db.col<T>(this.path, sf);
   }
 
   /**
-   * Returns the requested document
+   * Returns the requested child document
    * @param id the document id
    */
   public document<D extends dbCommon = T>(id: string): DatabaseDocument<D> {
@@ -38,7 +34,8 @@ export class DatabaseCollection<T extends dbCommon> {
   }
 
   /**
-   * Returns a promise of the collection content as an array
+   * Returns a promise of the collection content as an array.
+   * Thanks to AngularFire this runs in NgZone triggering change detection.
    * @param sf the optional filtering funciton
    */
   public get(sf?: dbStreamFn): Promise<T[]> {
@@ -54,7 +51,8 @@ export class DatabaseCollection<T extends dbCommon> {
   }
 
   /**
-   * Streams the collection content as an array into an observable
+   * Streams the collection content as an array into an observable.
+   * Thanks to AngularFire this runs in NgZone triggering change detection.
    * @param sf the optional filtering funciton
    */
   public stream(sf?: dbStreamFn): Observable<T[]> {

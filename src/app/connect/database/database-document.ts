@@ -4,6 +4,7 @@ import { DistributedCounter } from './database-counter';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+/** Common document content to extend from */
 export interface dbCommon {
   id?      : string,
   exists?  : boolean,
@@ -11,29 +12,27 @@ export interface dbCommon {
   updated? : dbTimestamp
 }
 
-/**
- * Document object in the database, created by the DatabaseService
- */
+/** Document object in the database, created by the DatabaseService */
 export class DatabaseDocument<T extends dbCommon> {
 
   constructor(readonly db: DatabaseService, public path: string, public id: string) {}
 
+  /** Helper returing the document reference for internal use */
   public get doc(): dbDocumentRef<T> {
     return this.db.doc(`${this.path}/${this.id}`);
   }
 
-  /**
-   * Returns the parent collection
-   */
+  /** Returns the parent collection */
   public get parent(): DatabaseCollection<T> {
     return this.db.collection<T>(this.path);
   }
 
+  /** Returns a child collection */
   public collection<C extends dbCommon>(name: string): DatabaseCollection<C> {
     return this.db.collection<C>(`${this.path}/${this.id}/${name}`);
   }
 
-  /** Returns a distributed counter supposedly located within the document */
+  /** Returns a child distributed counter */
   public counter(name: string, shards?: number): DistributedCounter {
     return this.db.distributedCounter(`${this.path}/${this.id}/${name}`, shards);
   }
@@ -74,9 +73,7 @@ export class DatabaseDocument<T extends dbCommon> {
     } as T);
   }
 
-  /**
-   * Check for document existance
-   */
+  /** Check for document existance */
   public exists(): Promise<boolean> {
     return this.doc.ref.get(undefined)
       .then(snap => snap.exists);
@@ -92,8 +89,9 @@ export class DatabaseDocument<T extends dbCommon> {
     })
   }
 
-  /**
-   * Returns the document content immediately
+  /** 
+   * Returns the document content immediately.
+   * Thanks to AngularFire this runs in NgZone triggering change detection.
    */
   public get(): Promise<T> {
     return this.doc.get()
@@ -104,8 +102,9 @@ export class DatabaseDocument<T extends dbCommon> {
       })).toPromise();
   }
 
-  /**
-   * Streams the document content with an observable
+  /** 
+   * Streams the document content with an observable.
+   * Thanks to AngularFire this runs in NgZone triggering change detection.
    */
   public stream(): Observable<T> {
     return this.doc.snapshotChanges()
@@ -116,9 +115,7 @@ export class DatabaseDocument<T extends dbCommon> {
       }));
   }
 
-  /**
-   * Deletes the document
-   */
+  /** Deletes the document */
   public delete(): Promise<void> {
     return this.doc.delete();
   }

@@ -9,9 +9,7 @@ interface CounterShard {
   id?   : string
 }
 
-/**
- * Implements a DistributedCounter extending a DatabaseCollection
- */
+/** Implements a DistributedCounter extending a DatabaseCollection */
 export class DistributedCounter extends DatabaseCollection<CounterShard> {
   
   /** Observable streaming the counter value */
@@ -78,9 +76,7 @@ export class DistributedCounter extends DatabaseCollection<CounterShard> {
     })
   }
 
-  /**
-   * Updates the counter by the given increment (or decrement)
-   */
+  /** Updates the counter by the given increment (or decrement) */
   public update(increment: number): Promise<void> {
     // Updates the local copy first to improve reactivity
     this._counter$.next(this._counter$.value + increment);
