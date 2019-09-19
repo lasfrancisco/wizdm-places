@@ -41,7 +41,7 @@ export class DatabaseCollection<T extends dbCommon> {
    * Returns a promise of the collection content as an array
    * @param sf the optional filtering funciton
    */
-  public get(sf?: dbStreamFn): Observable<T[]> {
+  public get(sf?: dbStreamFn): Promise<T[]> {
     return this.col(sf).get()
       .pipe( map( snapshot => {
         const docs = snapshot.docs;
@@ -50,7 +50,7 @@ export class DatabaseCollection<T extends dbCommon> {
           const id = doc.id;
           return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
         });
-      }));
+      })).toPromise();
   }
 
   /**

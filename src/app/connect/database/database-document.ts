@@ -16,11 +16,8 @@ export interface dbCommon {
  */
 export class DatabaseDocument<T extends dbCommon> {
 
-  constructor(readonly db: DatabaseService, public path: string, public id: string) { }
+  constructor(readonly db: DatabaseService, public path: string, public id: string) {}
 
-  /**
-   * Helper returing the document reference for internal use
-   */
   public get doc(): dbDocumentRef<T> {
     return this.db.doc(`${this.path}/${this.id}`);
   }
@@ -98,13 +95,13 @@ export class DatabaseDocument<T extends dbCommon> {
   /**
    * Returns the document content immediately
    */
-  public get(): Observable<T> {
+  public get(): Promise<T> {
     return this.doc.get()
       .pipe( map( snapshot => {
         const data = snapshot.data();
         const id = snapshot.id;
         return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
-      }));
+      })).toPromise();
   }
 
   /**

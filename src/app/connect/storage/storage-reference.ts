@@ -14,24 +14,24 @@ export class StorageReference {
     this.inner = createStorageRef(ref, st.scheduler);
   }
 
-  public getDownloadURL(): Observable<string> { 
-    return this.inner.getDownloadURL(); 
+  public getDownloadURL(): Promise<string> { 
+    return this.ref.getDownloadURL(); 
   }
 
-  public getMetadata(): Observable<stUploadMetadata>{ 
-    return this.inner.getMetadata(); 
+  public getMetadata(): Promise<stUploadMetadata>{ 
+    return this.ref.getMetadata(); 
   }
   
-  public delete(): Observable<any> { 
-    return this.inner.delete(); 
+  public delete(): Promise<void> { 
+    return this.ref.delete(); 
   }
 
   public child(path: string): StorageReference { 
     return this.st.ref( this.ref.child(path) ); 
   }
 
-  public updateMetadata(meta: stSettableMetadata): Observable<any> { 
-    return this.inner.updateMetadata(meta); 
+  public updateMetadata(meta: stSettableMetadata): Promise<any> { 
+    return this.ref.updateMetadata(meta); 
   }
 
   public put(data: any, metadata?: stUploadMetadata): stUploadTask {
@@ -42,25 +42,13 @@ export class StorageReference {
     return this.inner.putString(data, format, metadata);
   }
 
-  public list(options?: stListOptions): Observable<stListResult> {
+  public list(options?: stListOptions): Promise<stListResult> {
 
-    return this.st.scheduler.keepUnstableUntilFirst(
-      this.st.scheduler.runOutsideAngular(
-        from(this.st.scheduler.zone.runOutsideAngular(
-          () => this.ref.list(options)
-        ))
-      )
-    );
+    return this.ref.list(options);
   }
 
-  public listAll(): Observable<stListResult> {
+  public listAll(): Promise<stListResult> {
 
-    return this.st.scheduler.keepUnstableUntilFirst(
-      this.st.scheduler.runOutsideAngular(
-        from(this.st.scheduler.zone.runOutsideAngular(
-          () => this.ref.listAll()
-        ))
-      )
-    );
+    return this.ref.listAll();
   }  
 } 

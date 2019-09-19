@@ -19,9 +19,11 @@ export interface PageConfig {
 export class PagedCollection<T> extends DatabaseCollection<T> {  
   // Configuration options
   protected config: PageConfig;
+
+  private get emptyQuerySnapshot() { return { empty: true, docs: []} as QuerySnapshot<T>; }
   
   // Observable for data streaming
-  private _data$ = new BehaviorSubject(<QuerySnapshot<T>>{ empty: true, docs: []});
+  private _data$ = new BehaviorSubject(this.emptyQuerySnapshot);
   
   // Page cursor keeping track of the current page position
   private cursor: QueryDocumentSnapshot<T>
@@ -110,7 +112,7 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
     }
 
     if(!this._data$.value.empty) {
-      this._data$.next(<QuerySnapshot<T>>{ empty: true, docs: []});
+      this._data$.next(this.emptyQuerySnapshot);
     }
   }
 

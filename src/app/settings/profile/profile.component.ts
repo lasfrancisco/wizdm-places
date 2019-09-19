@@ -34,6 +34,8 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
     // Streams the profile photo
     this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
+
+    //this.storage.ref('lucio.jpg').getDownloadURL().subscribe( url => console.log(url) );
   }
 
   // Loads the profile creating a default one when missing
@@ -55,7 +57,7 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       }
     })
     // Loads the profile content
-    .then( () => this.get().toPromise() );
+    .then( () => this.get() );
   }
 
   // Updates the profile
@@ -93,12 +95,12 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
   private deleteFile(): Promise<void> {
 
     // Reads the profile photo url
-    return this.get().toPromise()
+    return this.get()
       .then( profile => profile.photo )
       // Turns the url into a ref
       .then( url => this.storage.refFromURL(url) )
       // Deletes the file
-      .then( ref => ref.delete().toPromise() )
+      .then( ref => ref.delete() )
       // Ensure to proceed whatever error has been encountered
       .catch( e => null );
   }
