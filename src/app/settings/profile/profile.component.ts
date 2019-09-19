@@ -3,8 +3,8 @@ import { AuthService, User, DatabaseService, DatabaseDocument, StorageService } 
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { dbUser } from '../../app.component';
-import { map, take, switchMap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'wm-profile',

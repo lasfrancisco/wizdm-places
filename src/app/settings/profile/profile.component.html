@@ -1,75 +1,85 @@
 
-<form [formGroup]="form" fxLayout="column" fxLayoutGap="16px" (ngSubmit)="save()">
+<div fxLayout="column" fxLayoutGap="16px">
 
-  <!-- Name -->
-  <mat-form-field>
-    <mat-label>Name</mat-label>
-    <input matInput formControlName="name" cdkFocusInitial>
-    <mat-hint>How do we call you</mat-hint>
-    <mat-error *ngIf="form.controls.name.errors?.required">
-      Please specify your name here
-    </mat-error>
-  </mat-form-field>
+  <h2>Public profile</h2>
 
-  <!-- Email -->
-  <mat-form-field>
-    <mat-label>Email</mat-label>
-    <input matInput formControlName="email">
-    <mat-hint> We'll keep you posted here</mat-hint>
-    <mat-error *ngIf="form.controls.email.errors?.email">
-      Ooops! it looks like this is not a valid email
-    </mat-error>
-  </mat-form-field>
+  <mat-divider fxFill></mat-divider>
 
-  <!-- Biography -->
-  <mat-form-field>
-    <mat-label>Bio</mat-label>
-    <textarea matInput formControlName="bio" cdkTextareaAutosize cdkAutosizeMinRows="3"></textarea>
-    <mat-hint>Let us know about you</mat-hint>
-  </mat-form-field>
+  <div fxLayout="row" fxLayoutGap="16px">
 
-  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || form.pristine">
-    Update Profile
-  </button>
+    <!-- Profile form -->
+    <form [formGroup]="form" fxLayout="column" fxLayoutGap="16px" (ngSubmit)="save()">
 
-</form>
+      <!-- Name -->
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" cdkFocusInitial>
+        <mat-hint>How do we call you</mat-hint>
+        <mat-error *ngIf="form.controls.name.errors?.required">
+          Please specify your name here
+        </mat-error>
+      </mat-form-field>
 
-<section class="avatar">
+      <!-- Email -->
+      <mat-form-field>
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email">
+        <mat-hint> We'll keep you posted here</mat-hint>
+        <mat-error *ngIf="form.controls.email.errors?.email">
+          Ooops! it looks like this is not a valid email
+        </mat-error>
+      </mat-form-field>
 
-  <div class="mat-small">Profile picture</div>
+      <!-- Biography -->
+      <mat-form-field>
+        <mat-label>Bio</mat-label>
+        <textarea matInput formControlName="bio" cdkTextareaAutosize cdkAutosizeMinRows="3"></textarea>
+        <mat-hint>Let us know about you</mat-hint>
+      </mat-form-field>
 
-  <div class="picture">
-
-    <ng-container *ngIf="(photo$ | async) as photo; else avatar">
-
-      <img [src]="photo" (error)="photo = ''" style="width: 100%"/>
-
-      <button mat-icon-button class="edit" (click)="deletePhoto()">
-        <mat-icon>delete</mat-icon>
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || form.pristine">
+        Update Profile
       </button>
 
-    </ng-container>
+    </form>
 
-    <ng-template #avatar>
+    <!-- Profile picture -->
+    <section class="avatar">
 
-      <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="6 6 36 36">
-        <path d="M6 10v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V10c0-2.21-1.79-4-4-4H10c-2.21 0-4 1.79-4 4zm24 8c0 3.32-2.69 6-6 6s-6-2.68-6-6c0-3.31 2.69-6 6-6s6 2.69 6 6zM12 34c0-4 8-6.2 12-6.2S36 30 36 34v2H12v-2z"/>
-      </svg>
+      <div class="mat-small">Profile picture</div>
 
-      <button mat-icon-button class="edit" (click)="openfile.click()">
-        <mat-icon>cloud_upload</mat-icon>
-      </button>
+      <div class="picture">
 
-      <input style="display:none" type="file" accept="image/*" (change)="uploadPhoto($event.target?.files?.item(0))" #openfile />
+        <!-- Photo w/ delete button -->
+        <ng-container *ngIf="(photo$ | async) as photo; else avatar">
 
-    </ng-template>
+          <img [src]="photo" (error)="photo = ''" style="width: 100%"/>
+
+          <button mat-icon-button class="edit" (click)="deletePhoto()">
+            <mat-icon>delete</mat-icon>
+          </button>
+
+        </ng-container>
+
+        <!-- Avatar w/ upload button -->
+        <ng-template #avatar>
+
+          <!-- Hidden openfile input -->
+          <input style="display:none" type="file" accept="image/*" (change)="uploadPhoto($event.target?.files?.item(0))" #openfile />
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="6 6 36 36">
+            <path d="M6 10v28c0 2.21 1.79 4 4 4h28c2.21 0 4-1.79 4-4V10c0-2.21-1.79-4-4-4H10c-2.21 0-4 1.79-4 4zm24 8c0 3.32-2.69 6-6 6s-6-2.68-6-6c0-3.31 2.69-6 6-6s6 2.69 6 6zM12 34c0-4 8-6.2 12-6.2S36 30 36 34v2H12v-2z"/>
+          </svg>
+
+          <button mat-icon-button class="edit" (click)="openfile.click()">
+            <mat-icon>cloud_upload</mat-icon>
+          </button>
+
+        </ng-template>
+
+      </div>
+
+    </section>
 
   </div>
-
-  <!--ng-container *ngIf="(files | async) as result"> 
-
-    <p *ngFor="let file of result.items">{{ file.name }}</p>
-
-  </ng-container-->
-
-</section>
+</div>

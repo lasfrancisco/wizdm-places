@@ -1,15 +1,11 @@
 
 :host {
-  display: flex;
-  flex-flow: row;
-  align-items: flex-start;
+  display: block;
   position: relative;
 
   form { width: 250px; }
   
   .avatar {
-
-    margin-left: 16px;
 
     .picture { position: relative; }
 
