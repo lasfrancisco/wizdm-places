@@ -8,6 +8,7 @@ export type stListOptions      = storage.ListOptions;
 export type stListResult       = storage.ListResult;
 export type stUploadMetadata   = storage.UploadMetadata;
 export type stSettableMetadata = storage.SettableMetadata;
+export type stFormat           = storage.StringFormat;
 export type stUploadTask       = AngularFireUploadTask;
 
 @Injectable()

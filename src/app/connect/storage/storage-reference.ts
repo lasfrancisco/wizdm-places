@@ -1,7 +1,5 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask, createStorageRef } from '@angular/fire/storage';
-import { runInZone } from '@angular/fire';
-import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
-import { from } from 'rxjs';
+import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions, stFormat } from './storage.service';
 
 /** Wraps the AngularFireStorageReference including list() and listAll() functionalities recently added to firebase API */
 export class StorageReference {
@@ -9,75 +7,58 @@ export class StorageReference {
   readonly inner: AngularFireStorageReference;
 
   constructor(readonly ref: stReference, readonly st: StorageService) { 
-
+    // Creates the inner AngularFireStorageReference
     this.inner = createStorageRef(ref, st.scheduler);
   }
 
-  public getDownloadURL(): Promise<string> { 
-
-    return this.ref.getDownloadURL();
-  }
-
-  public getMetadata(): Promise<stUploadMetadata>{ 
-
-    return this.ref.getMetadata();
-  }
-  
-  public delete(): Promise<void> { 
-    return this.ref.delete(); 
-  }
-
+  /** Returns a reference to a child item */
   public child(path: string): StorageReference { 
     return this.st.ref( this.ref.child(path) ); 
   }
 
+  //-- Reverts back to the original firebase API since there's no advantages from AngularFireStorage implementation
+
+  /** Returns the URL to download the file from */
+  public getDownloadURL(): Promise<string> { 
+    return this.ref.getDownloadURL();
+  }
+
+  /** Returns the file Metadata */
+  public getMetadata(): Promise<stUploadMetadata>{ 
+    return this.ref.getMetadata();
+  }
+  
+  /** Updates the file Metadata */
   public updateMetadata(meta: stSettableMetadata): Promise<any> { 
     return this.ref.updateMetadata(meta); 
   }
 
-  public put(data: any, metadata?: stUploadMetadata): stUploadTask {
+  /** Deletes the file from the storage */
+  public delete(): Promise<void> { 
+    return this.ref.delete();
+  }
+
+  //-- Extends the functionalities including the latest listing API
+  
+  /** Lists the items (files) and prefixes (folders) up to the maximum number optionally expressed in options */
+  public list(options?: stListOptions): Promise<stListResult> {
+    return this.ref.list(options);
+  }
+
+  /** List all the files and folders */
+  public listAll(): Promise<stListResult> {
+    return this.ref.listAll();
+  }
+
+  //-- Wraps uploading functioanlities taking advantage from AngularFireStorageReference implementation
+
+  /** Creates an upload task for binary data */
+  public put(data: Blob|Uint8Array|ArrayBuffer, metadata?: stUploadMetadata): stUploadTask {
     return this.inner.put(data, metadata);
   }
 
-  public putString(data: string, format?: string, metadata?: stUploadMetadata): stUploadTask {
+  /** Creates an upload task for text encoded data */
+  public putString(data: string, format?: stFormat, metadata?: stUploadMetadata): stUploadTask {
     return this.inner.putString(data, format, metadata);
   }
-
-  public list(options?: stListOptions): Promise<stListResult> {
-
-    return this.ref.list(options);
-/*
-    return this.st.scheduler.keepUnstableUntilFirst(
-      this.st.scheduler.runOutsideAngular(
-        from(this.st.zone.runOutsideAngular(() => 
-          this.ref.list(options)
-        ))
-      )
-    ).toPromise();
-
-    //return this.ref.list(options);
-/*
-    return this.st.zone.runOutsideAngular( () => new Promise( (resolve, reject) => {
-
-      this.ref.list(options)
-        .then( result => this.st.zone.run( () => resolve(result) ))
-        .catch(reason => this.st.zone.run( () => reject(reason) ))
-    }) );
-
-
-/*
-    //return this.ref.list(options);
-    return from(this.ref.list(options)).pipe(
-      runInZone(this.st.zone)
-    ).toPromise();
-  */
-  }
-
-  public listAll(): Promise<stListResult> {
-    
-    return this.ref.listAll();
-    /*return from(this.ref.listAll()).pipe(
-      runInZone(this.st.zone)
-    ).toPromise();*/
-  }  
 } 
