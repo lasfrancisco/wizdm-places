@@ -16,7 +16,7 @@ export class StorageService {
 
   get storage() { return this.st.storage; }
   get scheduler() { return this.st.scheduler; }
-  get zone() { return this.scheduler.zone; }
+  get zone() { return this.scheduler.zone; } 
 
   constructor(readonly st: AngularFireStorage) {}
 

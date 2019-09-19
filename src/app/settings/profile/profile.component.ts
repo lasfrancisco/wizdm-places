@@ -30,20 +30,16 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     });
 
     // Loads the profile into the form once 
-    this.load().then( data => {
-
-      console.log(data);
-      
-      this.form.patchValue(data)} ); 
+    this.load().then( data => this.form.patchValue(data) ); 
 
     // Streams the profile photo
     this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
 
     //this.storage.ref('lucio.jpg').getDownloadURL().subscribe( url => console.log(url) );
 
-    //this.storage.ref('').list().then( result => console.log(result) );
+    this.storage.ref('').list().then( result => console.log(result) );
 
-    //this.files = storage.ref('').list();
+    this.files = storage.ref('').list();
   }
 
   readonly files;
