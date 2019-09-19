@@ -1,25 +1,28 @@
 
-<section  fxLayout="row" fxFlex="80" fxFlexOffset="10">
+<section fxLayout="row" >
 
-  <mat-nav-list class="margins">
+  <mat-nav-list fxFlex="0 0 auto">
 
     <a mat-list-item routerLink="profile" routerLinkActive="active">
-      Profile
+      <mat-icon matListIcon>account_box</mat-icon>
+      <span fxHide.lt-sm>Profile</span>
     </a>
     
     <a mat-list-item routerLink="account" routerLinkActive="active">
-      Account
+      <mat-icon matListIcon>lock</mat-icon>
+      <span fxHide.lt-sm>Account</span>
     </a>
 
     <a mat-list-item (click)="auth.disconnect()">
-      SignOut
+      <mat-icon matListIcon>exit_to_app</mat-icon>
+      <span fxHide.lt-sm>SignOut</span>
     </a>
 
   </mat-nav-list>
 
   <mat-divider [vertical]="true"></mat-divider>
 
-  <div class="margins">
+  <div fxFlex="1 1 auto" class="margin">
     <router-outlet></router-outlet>
   </div>
 

@@ -1,4 +1,5 @@
 :host {
+  display: block;
   position: relative;
   margin: 0;
   top: 0;
@@ -6,13 +7,10 @@
   width: 100%;
   height: 100%;
 
-  display: flex;
-  flex-direction: row;
-
   .margins { margin: 16px 32px; }
 
   .active { 
-    border-left: 3px solid blue; 
-    margin-left: -3px;
+    border-left: 2px solid #0288D1; 
+    margin-left: -2px;
   }
 }
