@@ -34,12 +34,6 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
     // Streams the profile photo
     this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
-/*
-    this.storage.ref('').list().subscribe( list => {
-
-      console.log(list);
-
-    });*/
   }
 
   // Loads the profile creating a default one when missing
@@ -73,17 +67,30 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
   public uploadPhoto(file: File) {
 
-    if(!file) { return; }
+    if(!file) { return Promise.resolve(null); }
 
     // Uploads the file
-    this.storage.upload(`${this.id}/${file.name}`, file)
-      // Gets the url
-      .then( snap => snap.ref.getDownloadURL() ) 
+    return this.uploadFile(file)
       // Updates the profile with the new url
       .then( photo => this.update({ photo }) );
   }
 
-  private deletePhoto(): Promise<void> {
+  public deletePhoto(): Promise<void> {
+
+    // Deletes the file in the storage first
+    return this.deleteFile()
+      // Resets the photo url into the profile
+      .then( () => this.update({ photo: '' }) );
+  }
+
+  private uploadFile(file: File): Promise<string> {
+    // Uploads the file
+    return this.storage.upload(`${this.id}/${file.name}`, file)
+      // Returns the url
+      .then( snap => snap.ref.getDownloadURL() );
+  }
+
+  private deleteFile(): Promise<void> {
 
     // Reads the profile photo url
     return this.get().toPromise()
@@ -91,10 +98,8 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       // Turns the url into a ref
       .then( url => this.storage.refFromURL(url) )
       // Deletes the file
-      .then( ref => ref.delete() )
+      .then( ref => ref.delete().toPromise() )
       // Ensure to proceed whatever error has been encountered
-      .catch( e => null )
-      // Resets the photo url into the profile
-      .then( () => this.update({ photo: '' }) );
+      .catch( e => null );
   }
 }
