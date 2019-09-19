@@ -1,8 +1,7 @@
-import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from '@angular/fire/storage';
+import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask, createStorageRef } from '@angular/fire/storage';
+import { runInZone } from '@angular/fire';
 import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions } from './storage.service';
-import { createStorageRef } from '@angular/fire/storage';
-import { map, expand, takeWhile, switchMap } from 'rxjs/operators';
-import { Observable, from, of } from 'rxjs';
+import { from } from 'rxjs';
 
 /** Wraps the AngularFireStorageReference including list() and listAll() functionalities recently added to firebase API */
 export class StorageReference {
@@ -15,11 +14,13 @@ export class StorageReference {
   }
 
   public getDownloadURL(): Promise<string> { 
-    return this.ref.getDownloadURL(); 
+
+    return this.inner.getDownloadURL().toPromise(); 
   }
 
   public getMetadata(): Promise<stUploadMetadata>{ 
-    return this.ref.getMetadata(); 
+
+    return this.inner.getMetadata().toPromise(); 
   }
   
   public delete(): Promise<void> { 
@@ -44,11 +45,25 @@ export class StorageReference {
 
   public list(options?: stListOptions): Promise<stListResult> {
 
-    return this.ref.list(options);
+    return this.st.scheduler.keepUnstableUntilFirst(
+      this.st.scheduler.runOutsideAngular(
+        from(this.st.zone.runOutsideAngular(() => 
+          this.ref.list(options)
+        ))
+      )
+    ).toPromise();
+
+    //return this.ref.list(options);
+    return from(this.ref.list(options)).pipe(
+      runInZone(this.st.zone)
+    ).toPromise();
   }
 
   public listAll(): Promise<stListResult> {
 
-    return this.ref.listAll();
+    //return this.ref.listAll();
+    return from(this.ref.listAll()).pipe(
+      runInZone(this.st.zone)
+    ).toPromise();
   }  
 } 
