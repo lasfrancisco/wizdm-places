@@ -1,11 +1,48 @@
 
-<mat-list>
- <mat-list-item> 
-   <mat-icon matListIcon>folder</mat-icon>
-   <h3 matLine>Account created</h3>
-   <p matLine>{{ created$ | async | date }}</p>
-  
-  </mat-list-item>
- <mat-list-item> Salt </mat-list-item>
- <mat-list-item> Paprika </mat-list-item>
-</mat-list>
+<div fxLayout="column" fxLayoutGap="16px">
+
+  <h2>Account</h2>
+
+  <mat-divider></mat-divider>
+
+  <p>Your account has been created on <b>{{ created$ | async | date }}</b>.</p>
+
+  <h2>Verify email</h2>
+
+  <mat-divider></mat-divider>
+
+  <p>Your email {{ auth.emailVerified ? 'is already verified' : 'is not verified yet. Please proceed at your convenience' }}.</p>
+
+  <button mat-stroked-button color="primary" [disabled]="auth.emailVerified" (click)="verifyEmail()" fxFlexAlign="start">
+    Verify your email
+  </button>
+
+  <h2>Change email / password</h2>
+
+  <mat-divider></mat-divider>
+
+  <p>This will change the credentials used for signin-in.</p>
+
+  <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px"> 
+
+    <button mat-stroked-button color="primary" (click)="changeEmail()">
+      Change your email
+    </button>
+
+    <button mat-stroked-button color="primary" (click)="changePassword()">
+      Change your password
+    </button>
+
+  </div>
+
+  <h2>Delete account</h2>
+
+  <mat-divider></mat-divider>
+
+  <p>By proceeding you'll permanently delete all your data.</p>
+
+  <button mat-stroked-button color="warn" (click)="deleteAccount()" fxFlexAlign="start">
+    Delete your account
+  </button>
+
+</div>

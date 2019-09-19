@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService, User, DatabaseService, DatabaseDocument, StorageService, dbTimestamp } from '../../connect';
 import { dbUser } from '../../app.component';
-import { map, take, switchMap, catchError } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'wm-account',
@@ -19,9 +19,5 @@ export class AccountComponent extends DatabaseDocument<dbUser> {
     super(db, 'users', auth.userId);
 
     this.created$ = this.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
-
-    console.log(this.user);
-
   }
-
 }
