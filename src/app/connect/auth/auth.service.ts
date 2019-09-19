@@ -7,11 +7,14 @@ import { map } from 'rxjs/operators';
 export { User } from 'firebase';
 
 @Injectable()
+/** Wraps the AngularFireAuth service for extended functionalities */
 export class AuthService implements OnDestroy {
 
+  /** User object snapshot */
   public user: User = null;
   private sub: Subscription;
   
+  /** User object observable */
   get user$(): Observable<User|null> {
     return this.fire.user;
   }
@@ -23,35 +26,32 @@ export class AuthService implements OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
+  ngOnDestroy() { this.sub.unsubscribe(); }
 
-  // Returns true if user is logged in
+  /** Returns true if user is logged in */
   get authenticated(): boolean {
     return !!this.user;
   }
 
-  // User id helper
+  /** Returns the current user id, when authenticated */
   get userId(): string {
     return this.authenticated ? this.user.uid : '';
   }
 
-   // Email verified helper
+   /** Returns true whenever the current user email has been verified */
   get emailVerified(): boolean {
     return this.authenticated ? this.user.emailVerified : false;
   }
 
-  set language(code: string) {
-    this.fire.auth.languageCode = code;
-  }
-
-  get language(): string {
-    return this.fire.auth.languageCode;
-  }
+  /** Sets/Gets the code for the language to be used during the authentication */
+  set language(code: string) { this.fire.auth.languageCode = code; }
+  get language(): string { return this.fire.auth.languageCode; }
 
   /**
-   * Registers a new user
+   * Registers a new user by email and confirmPasswordReset
+   * @param email the email to register with
+   * @param password the secret password
+   * @param name (optional) the user name
    */
   public registerNew(email: string, password: string, name: string = ""): Promise<void> {
     
@@ -63,48 +63,11 @@ export class AuthService implements OnDestroy {
   }
 
   /**
-   * Sends an email verification
+   * Signs in with the given user email and password
+   * @param email the email to register with
+   * @param password the secret password 
+   * @returns the authenticated User object
    */
-  public sendEmailVerification(url?: string): Promise<void> {
-
-    console.log("Send email veriication");
-    
-    return this.authenticated ? 
-      this.user.sendEmailVerification( url ? { url } : undefined ) 
-        : Promise.resolve();
-  }
-
-  public applyActionCode(code: string): Promise<void> {
-
-    console.log("Applying action with code: " + code);
-    // Applies the received action code
-    return this.fire.auth.applyActionCode(code);
-  }
-/*
-  public updateEmail(password: string, newEmail: string): Promise<void> {
-    
-    const email = this.user.email;
-    console.log("Updating user email for: ", email);
-    // Gets fresh credentials for the current user
-    const credential = auth.EmailAuthProvider.credential(email, password);
-    // Re-authenticate the user with the fresh credentials
-    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
-      // Update the email
-      .then( credential => credential.user.updateEmail(newEmail) );
-  }
-
-  public updatePassword(password: string, newPassword: string): Promise<void> {
-    
-    const email = this.user.email;
-    console.log("Updating user password for: ", email);
-    // Gets fresh credentials for the current user
-    const credential = auth.EmailAuthProvider.credential(email, password);
-    // Re-authenticate the user with the fresh credentials
-    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
-      // Update the password
-      .then( credential => credential.user.updatePassword(newPassword) );
-  }
-*/
   public signIn(email: string, password: string): Promise<User>  {
     
     console.log("Signing in as: " + email);
@@ -113,10 +76,13 @@ export class AuthService implements OnDestroy {
       .then( credential => credential.user );
   }
 
+  /** 
+   * Refreshes the current authentication repeating the secret password 
+   * @param password the secret password 
+   * @returns the authenticated User object
+   */
   public refresh(password: string): Promise<User> {
 
-    //if(!this.authenticated) { return Promise.resolve(null); }
-    
     console.log("Refreshing authentication: ", this.user.email);
     // Gets fresh credentials for the current user
     const credential = auth.EmailAuthProvider.credential(this.user.email, password);
@@ -125,22 +91,11 @@ export class AuthService implements OnDestroy {
       .then( credential => credential.user );
   }
 
-   public forgotPassword(email: string, lang?: string, url?: string): Promise<void> {
-    
-    console.log("Resetting the password for: " + email);
-    // Send a password reset email
-    return this.authenticated ? 
-      this.fire.auth.sendPasswordResetEmail(email, url ? { url } : undefined ) 
-        : Promise.resolve();
-  }
-
-   public resetPassword(code: string, newPassword: string): Promise<void> {
-
-    console.log("Confirming the password with code: " + code);
-    // Resets to a new password applying the received activation code
-    return this.fire.auth.confirmPasswordReset(code, newPassword);
-  }
-
+  /** 
+   * Signs in using the given provider 
+   * @param provider the name of the provider to sign in with
+   * @returns the authenticated User object
+   */
   public signInWith(provider: string): Promise<User> {
 
     console.log("Signing-in using: " + provider);
@@ -180,10 +135,79 @@ export class AuthService implements OnDestroy {
       .then( credential => credential.user );
   }
 
+  /** Signs out */
   public signOut(): Promise<void> {
     console.log("Signing-out");
     return this.fire.auth.signOut();
   }
+
+  /**
+   * Sends an email to the user to verify the account email
+   * @param url (optional) the link to be passed as the continueUrl query parameter
+   */
+  public sendEmailVerification(url?: string): Promise<void> {
+
+    console.log("Send email veriication");
+    
+    return this.authenticated ? 
+      this.user.sendEmailVerification( url ? { url } : undefined ) 
+        : Promise.resolve();
+  }
+
+  
+  /** Applies the received action code to complete the requested action */
+  public applyActionCode(code: string): Promise<void> {
+
+    console.log("Applying action with code: " + code);
+    return this.fire.auth.applyActionCode(code);
+  }
+
+  /**
+   * Sends an email to the user to resets the account password
+   * @param url (optional) the link to be passed as the continueUrl query parameter
+   */
+  public sendPasswordResetEmail(email: string, url?: string): Promise<void> {
+    
+    console.log("Resetting the password for: " + email);
+    // Send a password reset email
+    return this.authenticated ? 
+      this.fire.auth.sendPasswordResetEmail(email, url ? { url } : undefined ) 
+        : Promise.resolve();
+  }
+
+  /** Confirms the new password completing a reset */
+  public confirmPasswordReset(code: string, newPassword: string): Promise<void> {
+
+    console.log("Confirming the password with code: " + code);
+    // Resets to a new password applying the received activation code
+    return this.fire.auth.confirmPasswordReset(code, newPassword);
+  }
+
+/*
+  public updateEmail(password: string, newEmail: string): Promise<void> {
+    
+    const email = this.user.email;
+    console.log("Updating user email for: ", email);
+    // Gets fresh credentials for the current user
+    const credential = auth.EmailAuthProvider.credential(email, password);
+    // Re-authenticate the user with the fresh credentials
+    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
+      // Update the email
+      .then( credential => credential.user.updateEmail(newEmail) );
+  }
+
+  public updatePassword(password: string, newPassword: string): Promise<void> {
+    
+    const email = this.user.email;
+    console.log("Updating user password for: ", email);
+    // Gets fresh credentials for the current user
+    const credential = auth.EmailAuthProvider.credential(email, password);
+    // Re-authenticate the user with the fresh credentials
+    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
+      // Update the password
+      .then( credential => credential.user.updatePassword(newPassword) );
+  }
+*/
 
   /**
    * Deletes the user account

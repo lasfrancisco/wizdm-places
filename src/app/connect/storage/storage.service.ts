@@ -12,7 +12,7 @@ export type stFormat           = storage.StringFormat;
 export type stUploadTask       = AngularFireUploadTask;
 
 @Injectable()
-/** Wraps the AngularFireStorage adding refFromURL() support */
+/** Wraps the AngularFireStorage service adding refFromURL() support */
 export class StorageService {
 
   get storage() { return this.st.storage; }
