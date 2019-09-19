@@ -21,19 +21,19 @@ export class StorageService {
 
   constructor(readonly st: AngularFireStorage) {}
 
+  /** Returns a reference to the storage object identified by its path */
   public ref(path: string|stReference): StorageReference {
-
     const ref = typeof path === 'string' ? this.storage.ref(path) : path;
-
     return new StorageReference(ref, this);
   }
 
+  /** Returns a reference to the storage object identified by its download URL */
   public refFromURL(url: string): StorageReference {
-
     return new StorageReference( this.storage.refFromURL(url), this);
   }
 
-  public upload(path: string, data: any, metadata?: stUploadMetadata): stUploadTask { 
+  /** Shortcut to start an upload task of binary data */
+  public upload(path: string, data: Blob|Uint8Array|ArrayBuffer, metadata?: stUploadMetadata): stUploadTask { 
     return this.st.upload(path, data, metadata);
   }
 }
