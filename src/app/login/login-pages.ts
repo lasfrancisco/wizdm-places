@@ -3,10 +3,12 @@ export const $pages = {
 
     register: {// Register new user page
       title: 'Register',
+      message: "Welcome to places. As a registered users you'll get unrestricted access to all the features",
       caption: 'Register with my email' 
     }, 
     signIn: { // Regular sign-in page
       title: 'Sign-in',
+      message: "We're glad to see you again. Please sign-in",
       caption: 'Sign-in with my email' 
     },
     forgotPassword: {// Ask for password reset page

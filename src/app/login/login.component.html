@@ -1,7 +1,8 @@
  
-<h1 class="mat-title" [@vanish]="page">{{ currentPage.title }}</h1>
-
-<p *ngIf="currentPage.message" @inflate>{{ currentPage.message }}</p>
+<div [@vanish]="page">
+  <h1 class="mat-title">{{ currentPage.title }}</h1>
+  <p class="mat-small">{{ currentPage.message }}</p>
+</div>
 
 <form [formGroup]="form" fxLayout="column" fxLayoutAlign="space-around stretch" fxLayoutGap="10px" (ngSubmit)="activate(page)" *ngIf="page !== 'promptEmail' && page !== 'verifyEmail' && page !== 'recoverEmail'">
 

@@ -47,20 +47,7 @@ export class LoginComponent implements OnInit {
 
     this.switchPage(this.page = action);
   }
-/*
-  public show(action: loginAction = 'signIn') {
 
-    switch(this.page = action) {
-
-        case 'signOut':
-        return from( this.auth.signOut() );
-
-    }
-
-    return this.dialog.open(this.template)
-      .afterClosed();
-  }
-*/
   ngOnInit() {
 
 /*
