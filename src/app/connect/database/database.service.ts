@@ -24,27 +24,22 @@ export interface PageConfigRt extends PageConfig {
 }
 
 @Injectable()
+/** Wraps the AngularFirestore service to support several enhancements */
 export class DatabaseService {
 
   constructor(readonly fire: AngularFirestore) { }
 
-  /**
-   * Return a server timestamp palceholder (it'll turn into a timestamp serverside) 
-   */
+  /** Return a server timestamp palceholder (it'll turn into a timestamp serverside) */
   public get timestamp(): dbValue {
     return firestore.FieldValue.serverTimestamp();
   }
 
-  /**
-   * Return an ID sentinel to be used in queries 
-   */
+  /** Return an ID sentinel to be used in queries */
   public get sentinelId(): dbPath {
     return firestore.FieldPath.documentId();
   }
 
-  /**
-   * Creates a geopoint at the given lat and lng
-   */
+  /** Creates a geopoint at the given lat and lng */
   public geopoint(lat: number, lng: number): dbGeopoint {
     return new firestore.GeoPoint(lat, lng);
   }
@@ -68,17 +63,12 @@ export class DatabaseService {
     return typeof ref === 'string' ? this.fire.doc<T>(ref) : ref;
   }
 
-  /**
-   * Returns a firestore.WriteBatch re-typed into a dbWriteBatch
-   * to support batch operations
-   */
+  /** Returns a firestore.WriteBatch re-typed into a dbWriteBatch to support batch operations */
   public batch(): dbWriteBatch {
     return this.fire.firestore.batch();
   }
 
-  /**
-   * Runs a firestore.Transaction to support atomic operations
-   */
+  /** Runs a firestore.Transaction to support atomic operations */
   public transaction<T>( updateFn: (t: dbTransaction) => Promise<T> ): Promise<T> {
     return this.fire.firestore.runTransaction<T>(updateFn);
   }

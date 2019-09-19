@@ -89,10 +89,7 @@ export class DatabaseDocument<T extends dbCommon> {
     })
   }
 
-  /** 
-   * Returns the document content immediately.
-   * Thanks to AngularFire this runs in NgZone triggering change detection.
-   */
+  /** Returns the document content immediately */
   public get(): Promise<T> {
     return this.doc.get().pipe( map( snapshot => {
       const data = snapshot.data();
@@ -101,10 +98,7 @@ export class DatabaseDocument<T extends dbCommon> {
     })).toPromise();
   }
 
-  /** 
-   * Streams the document content with an observable.
-   * Thanks to AngularFire this runs in NgZone triggering change detection.
-   */
+  /** Streams the document content with an observable */
   public stream(): Observable<T> {
     return this.doc.snapshotChanges().pipe( map( snapshot => {
       const data = snapshot.payload.data();

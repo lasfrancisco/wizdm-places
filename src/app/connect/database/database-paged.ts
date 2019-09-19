@@ -13,13 +13,13 @@ export interface PageConfig {
   prepend? : boolean  // prepend to source
 }
 
-/**
- * Extends DatabaseColletion implementing paged streaming to support infinite scrolling
- */
+/** Extends DatabaseColletion implementing paged streaming to support infinite scrolling */
 export class PagedCollection<T> extends DatabaseCollection<T> {  
+  
   // Configuration options
   protected config: PageConfig;
-
+  
+  // An empty QuerySnapshot
   private get emptyQuerySnapshot() { return { empty: true, docs: []} as QuerySnapshot<T>; }
   
   // Observable for data streaming
@@ -67,50 +67,34 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
    * @param opts (optional) the page configuration
    */
   public paging<O=T>(opts?: PageConfig): Observable<O[]> {
-
     // Initzialize the page configuration
     this.config = this.init(opts);
-    
     // Makes sure the page is empty
     this.reset();
-
     // Ask for the first page
     this.more();
-
     // Returns the observable array for data consumption
     return this._data$.pipe(
-      
       // Maps the internal data representation into the output data format
-      map( snapshot => {
-        const docs = snapshot.docs || [];
-        return docs.map(doc => this.output(doc));
-      }),
-
+      map( snapshot => (snapshot.docs || []).map(doc => this.output(doc)) ),
       // Reverse the array when prepending is requested
-      map( values => { 
-        return this.config.prepend ? values.reverse() : values;
-      }),
-      
+      map( values => this.config.prepend ? values.reverse() : values ),
       // Accumulates the resulting array
-      scan<O[]>( (acc, val) => { 
-        return this.config.prepend ? val.concat(acc) : acc.concat(val)
-      }),
-      
+      scan<O[]>( (acc, val) =>  this.config.prepend ? val.concat(acc) : acc.concat(val) ),
       // Resets the loading status
-      tap( () => {
-        this._loading$.next(false);
-      })
+      tap( () =>  this._loading$.next(false) )
     );
   }
 
+  /** Resets the paging */
   public reset(): void {
-
+    // Resets the cursor
     this.cursor = null;
-    
+    // Resets the 'done' flag
     if(this._done$.value) { 
       this._done$.next(false); 
     }
-
+    // Empties the output stream
     if(!this._data$.value.empty) {
       this._data$.next(this.emptyQuerySnapshot);
     }
@@ -121,31 +105,24 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
    * @param limit optionally custumize the number of document to retrive.
    */
   public more(limit?: number): void {
-
     // Skips when no more values or still loading
     if(this._done$.value || this._loading$.value) { return };
-
     // Sets the loading status
     this._loading$.next(true);
-    
     // Gets the next page and pushes it into the data stream
-    this.col(this.queryPage(limit)).get()
-      .subscribe( (page: QuerySnapshot<T>) => {
-
-        // Notifies when done
-        if(page.size === 0) {
-          this._loading$.next(false);
-          this._done$.next(true);
-          return;
-        }
-
-        // Tracks the cursor for the next page
-        const docs = page.docs;
-        this.cursor = this.config.prepend ? docs[0] : docs[docs.length - 1];
-    
-        // Pushes the data along the output stream
-        this._data$.next(page);
-      });
+    this.col(this.queryPage(limit)).get().subscribe( (page: QuerySnapshot<T>) => {
+      // Notifies when done
+      if(page.size === 0) {
+        this._loading$.next(false);
+        this._done$.next(true);
+        return;
+      }
+      // Tracks the cursor for the next page
+      const docs = page.docs;
+      this.cursor = this.config.prepend ? docs[0] : docs[docs.length - 1];
+      // Pushes the data along the output stream
+      this._data$.next(page);
+    });
   }
 
   // Helper to compute the pagination query function according to the current configuration
