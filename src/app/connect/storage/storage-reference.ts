@@ -15,12 +15,14 @@ export class StorageReference {
 
   public getDownloadURL(): Promise<string> { 
 
-    return this.inner.getDownloadURL().toPromise(); 
+    return this.inner.getDownloadURL()
+      .toPromise(); 
   }
 
   public getMetadata(): Promise<stUploadMetadata>{ 
 
-    return this.inner.getMetadata().toPromise(); 
+    return this.inner.getMetadata()
+      .toPromise(); 
   }
   
   public delete(): Promise<void> { 
@@ -45,6 +47,16 @@ export class StorageReference {
 
   public list(options?: stListOptions): Promise<stListResult> {
 
+
+    return this.ref.list(options);
+/*
+    return this.st.zone.runOutsideAngular( () => new Promise( (resolve, reject) => {
+
+      this.ref.list(options)
+        .then( result => this.st.zone.run( () => resolve(result) ))
+        .catch(reason => this.st.zone.run( () => reject(reason) ))
+    }) );
+/*
     return this.st.scheduler.keepUnstableUntilFirst(
       this.st.scheduler.runOutsideAngular(
         from(this.st.zone.runOutsideAngular(() => 
@@ -52,11 +64,12 @@ export class StorageReference {
         ))
       )
     ).toPromise();
-
+/*
     //return this.ref.list(options);
     return from(this.ref.list(options)).pipe(
       runInZone(this.st.zone)
     ).toPromise();
+  */
   }
 
   public listAll(): Promise<stListResult> {

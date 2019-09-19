@@ -94,12 +94,11 @@ export class DatabaseDocument<T extends dbCommon> {
    * Thanks to AngularFire this runs in NgZone triggering change detection.
    */
   public get(): Promise<T> {
-    return this.doc.get()
-      .pipe( map( snapshot => {
-        const data = snapshot.data();
-        const id = snapshot.id;
-        return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
-      })).toPromise();
+    return this.doc.get().pipe( map( snapshot => {
+      const data = snapshot.data();
+      const id = snapshot.id;
+      return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
+    })).toPromise();
   }
 
   /** 
@@ -107,12 +106,11 @@ export class DatabaseDocument<T extends dbCommon> {
    * Thanks to AngularFire this runs in NgZone triggering change detection.
    */
   public stream(): Observable<T> {
-    return this.doc.snapshotChanges()
-      .pipe( map( snapshot => {
-        const data = snapshot.payload.data();
-        const id = snapshot.payload.id;
-        return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
-      }));
+    return this.doc.snapshotChanges().pipe( map( snapshot => {
+      const data = snapshot.payload.data();
+      const id = snapshot.payload.id;
+      return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
+    }));
   }
 
   /** Deletes the document */
