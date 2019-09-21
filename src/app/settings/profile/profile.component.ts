@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User, DatabaseService, DatabaseDocument, StorageService } from '../../connect';
+import { AuthService, User, DatabaseService, DatabaseDocument, StorageService, UploadTask } from '../../connect';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { dbUser } from '../../app.component';
@@ -65,14 +65,21 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       .then( () => this.form.markAsPristine() );
   }
 
+  public uploadTask: UploadTask;
+
   public uploadPhoto(file: File) {
 
     if(!file) { return Promise.resolve(null); }
 
+    ( this.uploadTask = this.storage.upload(`${this.id}/${file.name}`, file) )
+      .then( snap => snap.ref.getDownloadURL() )
+      .then( photo => this.update({ photo }) )
+      .then( () => delete this.uploadTask );
+
     // Uploads the file
-    return this.uploadFile(file)
+    /*return this.uploadFile(file)
       // Updates the profile with the new url
-      .then( photo => this.update({ photo }) );
+      .then( photo => this.update({ photo }) );*/
   }
 
   public deletePhoto(): Promise<void> {

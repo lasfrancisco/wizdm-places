@@ -8,5 +8,6 @@ export * from './database/database-counter';
 export * from './database/database.module';
 export * from './storage/storage.service';
 export * from './storage/storage-reference';
+export * from './storage/upload-task';
 export * from './storage/storage.module';
 export * from './connect.module';

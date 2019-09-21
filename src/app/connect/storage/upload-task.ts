@@ -17,7 +17,12 @@ export class UploadTask {
   constructor(readonly task: stUploadTask) {
 
     // Builds the uploading progress observable.
-    this.snapshot$ = new Observable(subscriber => task.on('state_changed', subscriber ) );
+    this.snapshot$ = new Observable(subscriber => task.on('state_changed', 
+      snap => subscriber.next(snap),
+      error => subscriber.error(error),
+      () => subscriber.complete()
+    ));
+
     this.progress$ = this.snapshot$.pipe( map(s => s.bytesTransferred / s.totalBytes * 100) );
   }
 
