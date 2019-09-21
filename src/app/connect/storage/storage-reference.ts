@@ -1,15 +1,10 @@
-import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask, createStorageRef } from '@angular/fire/storage';
 import { StorageService, stReference, stUploadTask, stSettableMetadata, stUploadMetadata, stListResult, stListOptions, stFormat } from './storage.service';
+import { UploadTask } from './upload-task';
 
 /** Wraps the AngularFireStorageReference including list() and listAll() functionalities recently added to firebase API */
 export class StorageReference {
 
-  readonly inner: AngularFireStorageReference;
-
-  constructor(readonly ref: stReference, readonly st: StorageService) { 
-    // Creates the inner AngularFireStorageReference
-    this.inner = createStorageRef(ref, st.scheduler);
-  }
+  constructor(readonly ref: stReference, readonly st: StorageService) {}
 
   /** Returns a reference to a child item */
   public child(path: string): StorageReference { 
@@ -50,15 +45,15 @@ export class StorageReference {
     return this.ref.listAll();
   }
 
-  //-- Wraps uploading functioanlities taking advantage from AngularFireStorageReference implementation
+  //-- Wraps uploading functionalities taking advantage from AngularFireStorageReference implementation
 
   /** Creates an upload task for binary data */
-  public put(data: Blob|Uint8Array|ArrayBuffer, metadata?: stUploadMetadata): stUploadTask {
-    return this.inner.put(data, metadata);
+  public put(data: Blob|Uint8Array|ArrayBuffer, metadata?: stUploadMetadata): UploadTask {
+    return new UploadTask( this.ref.put(data, metadata) );
   }
 
   /** Creates an upload task for text encoded data */
-  public putString(data: string, format?: stFormat, metadata?: stUploadMetadata): stUploadTask {
-    return this.inner.putString(data, format, metadata);
+  public putString(data: string, format?: stFormat, metadata?: stUploadMetadata): UploadTask {
+    return new UploadTask( this.ref.putString(data, format, metadata) );
   }
 } 
