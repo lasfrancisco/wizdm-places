@@ -23,19 +23,19 @@ export class UploadTask {
     });
   }
 
-  public then(onFulfilled?: ((s: stUploadTaskSnapshot) => any) | null, onRejected?: ((e: Error) => any) | null): Promise<any> {
-    return this.task.then(onFulfilled, onRejected);
-  }
-
-  public catch(onRejected: (e: Error) => any): Promise<any> {
-    return this.task.catch(onRejected);
-  }
-
   public pause(): boolean { return this.task.pause(); }
-
-  public cancel(): boolean { return this.task.cancel(); }
-
+  
   public resume(): boolean { return this.task.resume(); }
+
+  public cancel(): boolean { return this.task.cancel(); }  
+
+  public then(fulfilled?: ((s: stUploadTaskSnapshot) => any) | null, rejected?: ((e: Error) => any) | null): Promise<any> {
+    return this.task.then(fulfilled, rejected);
+  }
+
+  public catch(rejected: (e: Error) => any): Promise<any> {
+    return this.task.catch(rejected);
+  }
   
   public stream(): Observable<stUploadTaskSnapshot> { 
     return this.inner$; 
