@@ -177,6 +177,10 @@ export class LoginComponent implements OnInit {
       this.updateEmail( this.password.value, this.newEmail.value );
       break;
 
+      case 'verifyEmail':
+      this.verifyEmail();
+      break;
+
       case 'delete':
       this.deleteAccount( this.password.value );
       break;
@@ -247,6 +251,16 @@ export class LoginComponent implements OnInit {
       .catch( error => this.showError(error.code) );
   }
 */
+
+  private verifyEmail() {
+    // Sends the email verification
+    this.auth.sendEmailVerification()
+      // Closes the dialog when done
+      .then( () => this.ref.close(null) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
+  }
+  
   private updateEmail(password: string, newEmail: string) {
     // Refreshes the authentication
     this.auth.refresh(password)

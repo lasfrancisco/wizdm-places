@@ -13,7 +13,7 @@
 
   <p>Your email {{ auth.emailVerified ? 'is already verified' : 'is not verified yet. Please proceed at your convenience' }}.</p>
 
-  <button mat-stroked-button color="primary" [disabled]="auth.emailVerified" (click)="verifyEmail()" fxFlexAlign="start">
+  <button mat-stroked-button color="primary" [disabled]="auth.emailVerified" (click)="guard.prompt('verifyEmail')" fxFlexAlign="start">
     Verify your email
   </button>
 
@@ -25,7 +25,7 @@
 
   <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="16px"> 
 
-    <button mat-stroked-button color="primary" (click)="guard.promt('changeEmail')">
+    <button mat-stroked-button color="primary" (click)="guard.prompt('changeEmail')">
       Change your email
     </button>
 

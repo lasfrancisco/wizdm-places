@@ -32,7 +32,8 @@ export const $pages = {
     },
     verifyEmail: {// Verify the email 
       title: "Email verification",
-      message: "An email has been sent to your address..."
+      message: "We'll be sending a link to verify your email",
+      caption: 'Send email verification'
     },
     confirmEmail: {// Confirm the email verification
       title: "Email verification",
