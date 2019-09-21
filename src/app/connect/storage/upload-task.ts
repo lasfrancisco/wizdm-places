@@ -4,21 +4,21 @@ import { map } from 'rxjs/operators';
 
 export class UploadTask {
 
-  readonly inner$: Observable<stUploadTaskSnapshot>;
+  /** 
+   * An observable streaming the task progress. 
+   * Unlike the AngularFireUploadTask implementation the task do NOT get cancelled 
+   * by unsubscribing while only the inner task events get disconnected
+   * */
+  readonly snapshot$: Observable<stUploadTaskSnapshot>;
+
+  /** An observable streaming the task progress as percentage */
+  readonly progress$: Observable<number>;
 
   constructor(readonly task: stUploadTask) {
 
-    // Build the uploading progress observable
-    this.inner$ = new Observable(subscriber => {
-      // Connects the task.on() callbacks
-      task.on('state_changed',
-        snap => subscriber.next(snap), 
-        error => subscriber.error(error),
-        () => subscriber.complete() 
-      );
-      // Returns the unsubscription handler
-      return () => task.cancel();
-    });
+    // Builds the uploading progress observable.
+    this.snapshot$ = new Observable(subscriber => task.on('state_changed', subscriber ) );
+    this.progress$ = this.snapshot$.pipe( map(s => s.bytesTransferred / s.totalBytes * 100) );
   }
 
   /** Pauses the task */
@@ -35,15 +35,5 @@ export class UploadTask {
   /** Promise-like catch */
   public catch(rejected: (e: Error) => any): Promise<any> {
     return this.task.catch(rejected);
-  }
-  /** Returns the observable streaming the task progress */
-  public stream(): Observable<stUploadTaskSnapshot> { 
-    return this.inner$; 
-  }
-  /** Returns an observable streaming the task progress as percentage */
-  public progress(): Observable<number> {
-    return this.inner$.pipe(
-      map(s => s.bytesTransferred / s.totalBytes * 100)
-    )
   }
 }
