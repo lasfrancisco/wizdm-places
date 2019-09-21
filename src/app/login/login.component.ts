@@ -146,24 +146,9 @@ export class LoginComponent implements OnInit {
     setTimeout(() => this.error = null, 5000);
   }
 
-  private reportSuccess(message: string, jumpTo?: string) {
-    
-    this.progress = false;
-    
-    console.log(message);
-/*
-    if(jumpTo) {
-      
-      this.router.navigate(['.'], { 
-        relativeTo: this.route,
-        queryParams: {
-          mode: jumpTo
-        } 
-      });
-    }*/
-  }
-
   public activate(action: loginAction) {
+
+    this.progress = true;
     
     switch(action) {
 
@@ -181,7 +166,7 @@ export class LoginComponent implements OnInit {
       break;
 
       case 'resetPassword':
-      this.resetPassword(this.code, this.newPassword.value );
+      this.resetPassword( this.code, this.newPassword.value );
       break;
 
       case 'changePassword':
@@ -199,43 +184,32 @@ export class LoginComponent implements OnInit {
   }
 
   private signInWith(provider: string) { 
-
-    this.progress = true;;
-
     // Signing-in with a provider    
     this.auth.signInWith( provider )
-      .then( user => this.reportSuccess('Signed in using ' + provider) )
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      })
+      // Closes the dialog returning the user
+      .then( user => this.ref.close(user) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
 
   private signIn(email: string, password: string) {
-    
-    this.progress = true;
-
     // Sign-in using email/password
     this.auth.signIn(email, password)
       // Closes the dialog returning the user
       .then( user => this.ref.close(user) )
-      // Keep the rror code on failure
+      // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
 
   private registerNew(email: string, password: string,name: string) {
-
-    this.progress = true;
-
     // Registering a new user with a email/password
     this.auth.registerNew(email, password, name )
-      .then( () => this.reportSuccess('Registered as ' + email) )
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      });
+      // Closes the dialog returning the user
+      .then( user => this.ref.close(user) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
-
+/*
   private verifyEmail(code?: string) {
     
     this.progress = true;
@@ -245,81 +219,62 @@ export class LoginComponent implements OnInit {
 
       this.auth.applyActionCode(code)
         .then( () => this.reportSuccess('Email verified') )
-        .catch( error => {
-          // Keep the error code on failure
-          this.showError(error.code);
-        });
+        // Dispays the error code, eventually
+        .catch( error => this.showError(error.code) );
     }
     else { // Otherwise, we treat the request to send a verification email
 
       this.auth.sendEmailVerification()
       .then( () => this.reportSuccess('Email verification sent') )
-      .catch( error => {
-        // Keep the error code on failure
-        this.showError(error.code);
-      });
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
     }
   }
-
+*/
   private forgotPassword(email: string) {
-    
-    this.progress = true;
 
-    this.auth.forgotPassword(email)
-      .then( () => this.reportSuccess('Request a password reset for' + email) )
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      })
+    this.auth.sendPasswordResetEmail(email)
+      // Closes the dialog returning null
+      //.then( () => this.ref.close(null) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
 
   private resetPassword(code: string, newPassword: string) {
+    
 
-    this.progress = true;
-
-    this.auth.resetPassword(code, newPassword)
+    this.auth.confirmPasswordReset(code, newPassword)
       .then( () => this.reportSuccess('Reset to a new password', 'signIn') )
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      })
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
 
   private updateEmail(password: string, newEmail: string) {
-
-    this.progress = true;
-   /*
-    this.auth.updateEmail(password, newEmail)
-      .then( () => this.reportSuccess('Email updated to ' + newEmail) )
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      })*/
+    // Refreshes the authentication
+    this.auth.refresh(password)
+      // Updates the email returning the new user object
+      .then( user => user.updateEmail(newEmail).then( () => this.ref.close(user) ) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
 
   private updatePassword(password: string, newPassword: string) {
-
-    this.progress = true;
-/*
-    this.auth.updatePassword(password, newPassword)
-      .then( () => this.reportSuccess('Password updated') )
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      })*/
+    // Refreshes the authentication
+    this.auth.refresh(password)
+      // Updates the password returning the new user object
+      .then( user => user.updatePassword(newPassword).then( () => this.ref.close(user) ) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
 
   private deleteAccount(password: string) {
-
-    this.progress = true;
-  /*
-    this.auth.deleteUser(password)
-      .then( () => {
-        this.reportSuccess('Account deleted', 'signIn');
-      })
-      .catch( error => {
-        // Keep the rror code on failure
-        this.showError(error.code);
-      })*/
+    // Refreshes the authentication
+    this.auth.refresh(password)
+      // Deletes the account
+      .then( user => user.delete() )
+      // Closes the dialog returning null
+      .then( () => this.ref.close(null) )
+      // Dispays the error code, eventually
+      .catch( error => this.showError(error.code) );
   }
 }  

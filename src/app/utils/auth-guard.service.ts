@@ -17,19 +17,19 @@ export class AuthGuard implements CanActivate {
 
   get userId() { return this.auth.userId; }
 
-  public authenticate(data: loginAction = 'signIn'): Promise<User> {
+  public prompt(data: loginAction = 'signIn'): Promise<User> {
+
+    return this.dialog.open<LoginComponent,loginAction, User>(LoginComponent, { data })
+      .afterClosed().toPromise();
+  }
+
+  public authenticate(action: loginAction = 'signIn'): Promise<User> {
 
     return this.auth.user$.pipe(
       
       take(1),
 
-      switchMap( user => {
-
-        if(!!user) { return of(user); }
-
-        return this.dialog.open<LoginComponent,loginAction, User>(LoginComponent, { data })
-          .afterClosed();
-      })
+      switchMap( user => !user ? this.prompt(action) : of(user) )
 
     ).toPromise();
   }
@@ -42,7 +42,6 @@ export class AuthGuard implements CanActivate {
 
   // Implements single route user authentication guarding
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-
     // Gets the authorization mode when specified
     const mode = route.queryParamMap.get('authMode') || 'signIn';
     // Prompts the user for authentication 
