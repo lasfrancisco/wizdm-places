@@ -13,7 +13,7 @@ export const $pages = {
     },
     forgotPassword: {// Ask for password reset page
       title: 'Reset password',
-      message: "We'll be sending a link to reset the password to your inbox",
+      message: "We'll be sending a link to reset the password to your email",
       caption: 'Reset the password' 
     },
     resetPassword: {// Reset to a new password page (2nd step after forgotPassword)
@@ -30,11 +30,11 @@ export const $pages = {
       message: "Please confirm by re-authenticating",
       caption: 'Change your email'
     },
-    promptEmail: {// Change the email 
+    verifyEmail: {// Verify the email 
       title: "Email verification",
       message: "An email has been sent to your address..."
     },
-    verifyEmail: {// Change the email 
+    confirmEmail: {// Confirm the email verification
       title: "Email verification",
       message: "Thank you for verifying your email. You might need to sign-in again before seeing the effects"
     },

@@ -164,11 +164,11 @@ export class LoginComponent implements OnInit {
       case 'forgotPassword':
       this.forgotPassword( this.email.value );
       break;
-
+/*
       case 'resetPassword':
       this.resetPassword( this.code, this.newPassword.value );
       break;
-
+*/
       case 'changePassword':
       this.updatePassword( this.password.value, this.newPassword.value );
       break;
@@ -212,8 +212,7 @@ export class LoginComponent implements OnInit {
 /*
   private verifyEmail(code?: string) {
     
-    this.progress = true;
-
+    
     // When a verification code is specified, we treat the request as a confirmation
     if(code) {
 
@@ -235,20 +234,19 @@ export class LoginComponent implements OnInit {
 
     this.auth.sendPasswordResetEmail(email)
       // Closes the dialog returning null
-      //.then( () => this.ref.close(null) )
+      .then( () => this.ref.close(null) )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
-
+/*
   private resetPassword(code: string, newPassword: string) {
     
-
     this.auth.confirmPasswordReset(code, newPassword)
-      .then( () => this.reportSuccess('Reset to a new password', 'signIn') )
+      //.then( () => this.reportSuccess('Reset to a new password', 'signIn') )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
-
+*/
   private updateEmail(password: string, newEmail: string) {
     // Refreshes the authentication
     this.auth.refresh(password)
