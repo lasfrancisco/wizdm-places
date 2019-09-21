@@ -67,18 +67,18 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
 
   public uploadTask: UploadTask;
 
-  public uploadPhoto(file: File) {
+  public uploadPhoto(file: File): Promise<void> {
 
     if(!file) { return Promise.resolve(null); }
 
     // Creates the uploading task, this will display the progress bar in the view
-    ( this.uploadTask = this.storage.upload(`${this.id}/${file.name}`, file) )
+    return ( this.uploadTask = this.storage.upload(`${this.id}/${file.name}`, file) )
       // Returns the url
       .then( snap => snap.ref.getDownloadURL() )
       // Updates the profile with the new url
       .then( photo => this.update({ photo }) )
       // Deletes the task object removing the progress bar from the view
-      .then( () => delete this.uploadTask );
+      .then( () => (delete this.uploadTask, null) );
   }
 
   public deletePhoto(): Promise<void> {
