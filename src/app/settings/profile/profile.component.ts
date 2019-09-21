@@ -91,15 +91,16 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
   }
 
   private deleteFile(): Promise<void> {
-
-    // Reads the profile photo url
-    return this.get()
-      .then( profile => profile.photo )
-      // Turns the url into a ref
-      .then( url => this.storage.refFromURL(url) )
-      // Deletes the file
-      .then( ref => ref.delete() )
-      // Ensure to proceed whatever error has been encountered
-      .catch( e => null );
+    // Reads the profile to get the photo url
+    return this.get().then( profile => {
+      // Skips then no file
+      if(!profile || !profile.photo) { return null; }
+      // Gets the storage ref from the url...
+      const ref = this.storage.refFromURL(profile.photo);
+      //... and deletes the file
+      return ref.delete();
+    })
+    // Ensure to proceed whatever error has been encountered
+    .catch( e => null );
   }
 }
