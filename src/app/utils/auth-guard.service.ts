@@ -38,6 +38,7 @@ export class AuthGuard implements CanActivate {
     ).toPromise();
   }
 
+  /** Disconnects the user navigating to home */
   public disconnect(jumpTo = '/'): Promise<boolean> {
 
     return this.auth.signOut()
