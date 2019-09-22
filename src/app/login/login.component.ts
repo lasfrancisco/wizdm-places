@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
   private newEmail: FormControl;
   private newPassword: FormControl;
 
-  private hide = true;
+  public hidePassword = true;
   public error = null;
   public progress = false;
   
