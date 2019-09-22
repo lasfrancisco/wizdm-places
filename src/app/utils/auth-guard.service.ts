@@ -13,16 +13,20 @@ export class AuthGuard implements CanActivate {
 
   constructor(readonly auth: AuthService, private router: Router, private dialog: MatDialog) {}
 
+  /** Returns true whenever the user is authenticated */
   get authenticated() { return this.auth.authenticated; }
 
+  /** Returns the current authenticated user id */
   get userId() { return this.auth.userId; }
 
+  /** Prompts the user for authentication */
   public prompt(data: loginAction = 'signIn'): Promise<User> {
 
     return this.dialog.open<LoginComponent,loginAction, User>(LoginComponent, { data })
       .afterClosed().toPromise();
   }
 
+  /** Performs the user authentication prompting the user when neeed or resolving to the current authenticated user otherwise */
   public authenticate(action: loginAction = 'signIn'): Promise<User> {
 
     return this.auth.user$.pipe(
