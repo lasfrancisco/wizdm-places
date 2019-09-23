@@ -1,14 +1,14 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { from } from 'rxjs';
 import { AuthService, User } from '../connect';
 import { $animations } from './login-animations';
 import { $providers } from './login-providers';
 import { $pages } from './login-pages';
+import { from } from 'rxjs';
 
-export type loginAction = 'register'|'signIn'|'forgotPassword'|'resetPassword'|'changePassword'|'changeEmail'|'promptEmail'|'verifyEmail'|'recoverEmail'|'delete'|'signOut';
+export type loginAction = 'register'|'signIn'|'forgotPassword'|'changePassword'|'changeEmail'|'delete'|'signOut';
 
 @Component({
   selector : 'wm-login',
@@ -16,7 +16,7 @@ export type loginAction = 'register'|'signIn'|'forgotPassword'|'resetPassword'|'
   styleUrls : ['./login.component.scss'],
   animations: $animations
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
   readonly providers = $providers;
   private pages = $pages;
@@ -48,43 +48,6 @@ export class LoginComponent implements OnInit {
     this.switchPage(this.page = action);
   }
 
-  ngOnInit() {
-
-/*
-    // Discrimnate among the login option using the queryParameters
-    this.route.queryParamMap.subscribe( (params: ParamMap) => {
-
-      const mode  = params.get('mode') || 'signIn';
-      this.code = params.get('oobCode');
-
-      console.log('login mode: ', mode);
-
-      switch(mode) {
-
-        case 'signOut':
-        this.signOut();
-        break;
-
-        case 'promptEmail':
-        this.verifyEmail( this.code );
-        break;
-
-        // Apply the action code in case of email revert or verification
-        case 'verifyEmail':
-        case 'recoverEmail':
-
-        if(this.code) {
-          this.auth.applyActionCode( this.code )
-            .catch( error => this.showError(error.code) );
-        }
-        break;        
-      }
-
-      this.switchPage(mode as loginAction);
-    });
-    */
-  }
-
   get currentPage() { return this.pages[this.page || 'signIn']; }
 
   private switchPage(page: loginAction) {
@@ -112,11 +75,11 @@ export class LoginComponent implements OnInit {
       case 'forgotPassword':
       this.form.addControl('email', this.email);
       break;
-
+/*
       case 'resetPassword':
       this.form.addControl('newPassword', this.newPassword);
       break;
-
+*/
       case 'changePassword':
       this.form.addControl('password', this.password);
       this.form.addControl('newPassword', this.newPassword);
@@ -129,12 +92,6 @@ export class LoginComponent implements OnInit {
 
       case 'delete':
       this.form.addControl('password', this.password);      
-      break;
-
-      // Formless page
-      case 'promptEmail':
-      case 'verifyEmail':
-      case 'recoverEmail':
       break;
     }
   }
@@ -177,10 +134,6 @@ export class LoginComponent implements OnInit {
       this.updateEmail( this.password.value, this.newEmail.value );
       break;
 
-      case 'verifyEmail':
-      this.verifyEmail();
-      break;
-
       case 'delete':
       this.deleteAccount( this.password.value );
       break;
@@ -213,27 +166,7 @@ export class LoginComponent implements OnInit {
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
-/*
-  private verifyEmail(code?: string) {
-    
-    
-    // When a verification code is specified, we treat the request as a confirmation
-    if(code) {
 
-      this.auth.applyActionCode(code)
-        .then( () => this.reportSuccess('Email verified') )
-        // Dispays the error code, eventually
-        .catch( error => this.showError(error.code) );
-    }
-    else { // Otherwise, we treat the request to send a verification email
-
-      this.auth.sendEmailVerification()
-      .then( () => this.reportSuccess('Email verification sent') )
-      // Dispays the error code, eventually
-      .catch( error => this.showError(error.code) );
-    }
-  }
-*/
   private forgotPassword(email: string) {
 
     this.auth.sendPasswordResetEmail(email)
@@ -251,15 +184,6 @@ export class LoginComponent implements OnInit {
       .catch( error => this.showError(error.code) );
   }
 */
-
-  private verifyEmail() {
-    // Sends the email verification
-    this.auth.sendEmailVerification()
-      // Closes the dialog when done
-      .then( () => this.ref.close(null) )
-      // Dispays the error code, eventually
-      .catch( error => this.showError(error.code) );
-  }
   
   private updateEmail(password: string, newEmail: string) {
     // Refreshes the authentication
@@ -282,10 +206,8 @@ export class LoginComponent implements OnInit {
   private deleteAccount(password: string) {
     // Refreshes the authentication
     this.auth.refresh(password)
-      // Deletes the account
-      .then( user => user.delete() )
-      // Closes the dialog returning null
-      .then( () => this.ref.close(null) )
+      // Closes the dialog returning the user object 
+      .then( user => this.ref.close(user) )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }

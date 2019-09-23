@@ -163,7 +163,6 @@ export class AuthService implements OnDestroy {
       this.user.sendEmailVerification( url ? { url } : undefined ) 
         : Promise.resolve();
   }
-
   
   /** Applies the received action code to complete the requested action */
   public applyActionCode(code: string): Promise<void> {
@@ -192,47 +191,4 @@ export class AuthService implements OnDestroy {
     // Resets to a new password applying the received activation code
     return this.auth.confirmPasswordReset(code, newPassword);
   }
-
-/*
-  public updateEmail(password: string, newEmail: string): Promise<void> {
-    
-    const email = this.user.email;
-    console.log("Updating user email for: ", email);
-    // Gets fresh credentials for the current user
-    const credential = auth.EmailAuthProvider.credential(email, password);
-    // Re-authenticate the user with the fresh credentials
-    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
-      // Update the email
-      .then( credential => credential.user.updateEmail(newEmail) );
-  }
-
-  public updatePassword(password: string, newPassword: string): Promise<void> {
-    
-    const email = this.user.email;
-    console.log("Updating user password for: ", email);
-    // Gets fresh credentials for the current user
-    const credential = auth.EmailAuthProvider.credential(email, password);
-    // Re-authenticate the user with the fresh credentials
-    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
-      // Update the password
-      .then( credential => credential.user.updatePassword(newPassword) );
-  }
-*/
-
-  /**
-   * Deletes the user account
-   * @param password the user password to confirm deletion
-   * @param dispone an optionl function invoked during the process to dispose for other user related resources
-   */
-  /*
-  public deleteUser(password: string): Promise<void> {
-
-    console.log("Deleting the user ", this.user.email);
-    // Gets fresh credentials for the current user
-    const credential = auth.EmailAuthProvider.credential(this.user.email, password);
-    // Re-authenticate the user with the fresh credentials
-    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
-      // Deletes the account and sign-out
-      .then( credential => credential.user.delete() );
-  }*/
 }

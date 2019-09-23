@@ -25,4 +25,22 @@ export class AccountComponent {
 
     this.created$ = this.document.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
   }
+
+  public deleteAccount() {
+
+    // Prompts the user to confirm the deletion by re-authenticating
+    this.guard.prompt('delete')
+      .then( user  => {
+
+        // Skips to proceed on fail/abort
+        if(!user) { return null; }
+
+        // Deletes the profile document first
+        return this.document.delete()
+          // Deletes the account object next
+          .then( () => this.user.delete() )
+          // Navigates to home when done
+          .then( () => this.guard.router.navigate(['/'] ));
+      });
+  }
 }

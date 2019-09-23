@@ -11,7 +11,7 @@ import { AuthService, User } from '../connect';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(readonly auth: AuthService, private router: Router, private dialog: MatDialog) {}
+  constructor(readonly auth: AuthService, readonly router: Router, private dialog: MatDialog) {}
 
   /** Returns true whenever the user is authenticated */
   get authenticated() { return this.auth.authenticated; }
