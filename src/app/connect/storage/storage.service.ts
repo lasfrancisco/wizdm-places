@@ -17,9 +17,10 @@ export type stUploadTaskSnapshot = storage.UploadTaskSnapshot;
 /** Wraps the AngularFireStorage service adding refFromURL() support */
 export class StorageService {
 
-  get storage() { return this.st.storage; }
-
   constructor(readonly st: AngularFireStorage) {}
+
+  /** Returns the storage instance */
+  public get storage() { return this.st.storage; }
 
   /** Returns a reference to the storage object identified by its path */
   public ref(path: string|stReference): StorageReference {

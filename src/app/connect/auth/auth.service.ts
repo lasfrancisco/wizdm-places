@@ -13,13 +13,13 @@ export class AuthService implements OnDestroy {
   // Wraps AngularFireAuth basic functionalities
 
   /** Firebase Auth instance */
-  get auth() { return this.fire.auth; }
+  public get auth() { return this.fire.auth; }
   /** Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out */
-  get authState$() { return this.fire.authState; }
+  public get authState$() { return this.fire.authState; }
   /** Observable of the currently signed-in user's JWT token used to identify the user to a Firebase service (or null) */
-  get idToken$() {return this.fire.idToken; }
+  public get idToken$() { return this.fire.idToken; }
   /** Observable of the currently signed-in user (or null) */
-  get user$() { return this.fire.user; }
+  public get user$() { return this.fire.user; }
 
   // Persists a User object snapshot
 
@@ -39,23 +39,23 @@ export class AuthService implements OnDestroy {
   // Extends the Auth service features
 
   /** Returns true if user is logged in */
-  get authenticated(): boolean {
+  public get authenticated(): boolean {
     return !!this.user;
   }
 
   /** Returns the current user id, when authenticated */
-  get userId(): string {
+  public get userId(): string {
     return this.authenticated ? this.user.uid : '';
   }
 
    /** Returns true whenever the current user email has been verified */
-  get emailVerified(): boolean {
+  public get emailVerified(): boolean {
     return this.authenticated ? this.user.emailVerified : false;
   }
 
   /** Sets/Gets the code for the language to be used during the authentication */
-  set language(code: string) { this.auth.languageCode = code; }
-  get language(): string { return this.auth.languageCode; }
+  public set language(code: string) { this.auth.languageCode = code; }
+  public get language(): string { return this.auth.languageCode; }
 
   /**
    * Registers a new user by email and confirmPasswordReset

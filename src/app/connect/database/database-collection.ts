@@ -1,8 +1,7 @@
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { DatabaseService, dbCollectionRef, dbStreamFn } from './database.service';
+import { DatabaseService, dbCollectionRef, dbQueryFn } from './database.service';
 import { DatabaseDocument, dbCommon } from './database-document';
-import { Observable, BehaviorSubject, of, from } from 'rxjs';
-import { map, mergeMap,switchMap, expand, takeWhile } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, mergeMap, expand, takeWhile } from 'rxjs/operators';
 
 /** Collection object in the database, created by the DatabaseService */
 export class DatabaseCollection<T extends dbCommon> {
@@ -10,8 +9,8 @@ export class DatabaseCollection<T extends dbCommon> {
   constructor(readonly db: DatabaseService, readonly ref: dbCollectionRef) {}
 
   /** Helper returing the collection reference for internal use */
-  public col(sf?: dbStreamFn) {
-    return this.db.afs.collection(this.ref, sf);
+  public col(qf?: dbQueryFn) {
+    return this.db.afs.collection(this.ref, qf);
   }
 
   /**
@@ -37,11 +36,11 @@ export class DatabaseCollection<T extends dbCommon> {
   /**
    * Returns a promise of the collection content as an array.
    * Thanks to AngularFire this runs in NgZone triggering change detection.
-   * @param sf the optional filtering funciton
+   * @param qf the optional filtering funciton
    */
-  public get(sf?: dbStreamFn): Promise<T[]> {
+  public get(qf?: dbQueryFn): Promise<T[]> {
     // Assosiates the query to the collection ref, if any
-    const ref = !!sf ? sf(this.ref) : this.ref;
+    const ref = !!qf ? qf(this.ref) : this.ref;
     // Gets the document snapshot
     return ref.get().then( snapshot => { 
         // Maps the snapshot in the dbCommon-like content
@@ -57,11 +56,11 @@ export class DatabaseCollection<T extends dbCommon> {
   /**
    * Streams the collection content as an array into an observable.
    * Thanks to AngularFire this runs in NgZone triggering change detection.
-   * @param sf the optional filtering funciton
+   * @param qf the optional filtering funciton
    */
-  public stream(sf?: dbStreamFn): Observable<T[]> {
+  public stream(qf?: dbQueryFn): Observable<T[]> {
     // Gets a snapshotChanges observable using AungularFirestoreColleciton
-    return this.col(sf).snapshotChanges()
+    return this.col(qf).snapshotChanges()
       // Than maps the snapshot to the dbCommon-like content
       .pipe( map(actions => {
         return actions.map(a => {

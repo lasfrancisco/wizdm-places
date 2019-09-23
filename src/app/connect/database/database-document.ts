@@ -1,4 +1,3 @@
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { DatabaseService, dbDocumentRef, dbTimestamp } from './database.service';
 import { DatabaseCollection } from './database-collection';
 import { DistributedCounter } from './database-counter';

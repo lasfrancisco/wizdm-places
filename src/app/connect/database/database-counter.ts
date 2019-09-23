@@ -2,7 +2,6 @@ import { DatabaseService, dbCollectionRef } from './database.service';
 import { DatabaseCollection } from './database-collection';
 import { Observable, BehaviorSubject, merge } from 'rxjs';
 import { map, tap, distinctUntilChanged } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
 
 interface CounterShard {
   count : number,

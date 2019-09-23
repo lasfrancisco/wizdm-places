@@ -1,8 +1,8 @@
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { DatabaseService, dbCollectionRef, dbQuery, dbStreamFn } from './database.service';
+import { DatabaseService, dbCollectionRef, dbQuery } from './database.service';
 import { DatabaseCollection } from './database-collection';
-import { Observable, BehaviorSubject, ReplaySubject } from 'rxjs';
-import { map, scan, tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap, map, scan } from 'rxjs/operators';
 
 export type PagePostProcessOp<I,O> = (data: Observable<I[]>) => Observable<I[]|O[]>;
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { DatabaseDocument } from './database-document'
 import { DatabaseCollection } from './database-collection';
-import { PagedCollection, PageConfig } from './database-paged';
+import { PagedCollection } from './database-paged';
 import { DistributedCounter } from './database-counter';
 import { firestore } from 'firebase/app';
 //--
@@ -15,15 +15,16 @@ export type dbPath = firestore.FieldPath;
 export type dbValue = firestore.FieldValue;
 export type dbGeopoint = firestore.GeoPoint;
 export type dbQuery = firestore.Query;
-export type dbStreamFn = (ref: dbCollectionRef | dbQuery) => dbQuery;
+export type dbQueryFn = (ref: dbCollectionRef | dbQuery) => dbQuery;
 
 @Injectable()
 /** Wraps the AngularFirestore service to support several enhancements */
 export class DatabaseService {
 
-  get firestore() { return this.afs.firestore; }
-
   constructor(readonly afs: AngularFirestore) { }
+
+  /** Returns the firestore instance */
+  public get firestore() { return this.afs.firestore; }
 
   /** Return a server timestamp palceholder (it'll turn into a timestamp serverside) */
   public get timestamp(): dbValue {
