@@ -16,7 +16,10 @@ export class AccountComponent {
 
   readonly created$: Observable<Date>;
 
+  get router() { return this.guard.router; }
+
   get auth() { return this.guard.auth; }
+  
   get user() { return this.auth.user || {} as User };
 
   constructor(readonly guard: AuthGuard, private db: DatabaseService) { 
@@ -27,7 +30,8 @@ export class AccountComponent {
   }
 
   public sendEmailVerification() {
-    
+
+    return this.auth.sendEmailVerification(this.router.url);
   }
 
   public deleteAccount() {
@@ -44,7 +48,7 @@ export class AccountComponent {
           // Deletes the account object next
           .then( () => this.user.delete() )
           // Navigates to home when done
-          .then( () => this.guard.router.navigate(['/'] ));
+          .then( () => this.router.navigate(['/'] ));
       });
   }
 }
