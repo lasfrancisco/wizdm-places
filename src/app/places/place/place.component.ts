@@ -16,7 +16,9 @@ export interface dbPlace extends dbCommon {
   styleUrls: ['./place.component.scss'],
   animations: $animations
 })
-export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestroy {
+export class PlaceComponent implements OnDestroy {
+
+  private document: DatabaseDocument<dbPlace>;
 
   private _favorite$ = new BehaviorSubject<boolean>(false);
   private favorite$: Observable<boolean>;
@@ -33,9 +35,7 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
   get favorite() { return this._favorite$.value; }
   get authenticated() { return this.guard.authenticated; }
 
-  constructor(private guard: AuthGuard, db: DatabaseService) { 
-    super(db, 'places', '');
-  }
+  constructor(private guard: AuthGuard, private db: DatabaseService) {}
 
   @HostBinding('style.background-image') 
   private get photoUrl() {
@@ -47,33 +47,27 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
 
     console.log('Place:', data.name);
 
-    this.initPlace(data);    
+    // Gets a reference to the document in the DB
+    this.document = this.db.document<dbPlace>(`places/${data.id}`);
+    
+    // Unsubscribes previous subscriptions, eventually
+    if(!!this.sub) { this.sub.unsubscribe(); }
+    
+    // Streams the data content starting from the known set
+    this.sub = this.document.stream().pipe( startWith(data) )
+      .subscribe( data => this.data = data );  
+
+    // Gets the likes distributed counter
+    this.likes = this.document.counter('likes');
+    
+     // Gets the collection of likers
+    this.likers = this.document.collection('likers');
+    
+    // Builds the favorite flag
+    this.favorite$ = this.initFavorite();   
  }
 
   ngOnDestroy() { !!this.sub && this.sub.unsubscribe(); }
-
-  private initPlace(data: dbPlace) {
-
-    // Unsubscribes previous subscriptions, eventually
-    if(!!this.sub) { this.sub.unsubscribe(); }
-    // Subscribes to keeps the data in sync
-    this.sub = this.syncData(data)
-    // Gets the likes distributed counter
-    this.likes = this.counter('likes');
-     // Gets the collection of likers
-    this.likers = this.collection('likers');
-    // Builds the favorite flag
-    this.favorite$ = this.initFavorite();
-  }
-
-  private syncData(data: dbPlace) {
-
-    // Updates the document id
-    this.id = data.id;
-    // Streams the data content starting from the known set
-    return this.stream().pipe( startWith(data) )
-      .subscribe( data => this.data = data );    
-  }
 
   /** Builds the favorite flag Observable */
   private initFavorite(): Observable<boolean> {

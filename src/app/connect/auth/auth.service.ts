@@ -10,14 +10,22 @@ export { User } from 'firebase';
 /** Wraps the AngularFireAuth service for extended functionalities */
 export class AuthService implements OnDestroy {
 
+  // Wraps AngularFireAuth basic functionalities
+
+  /** Firebase Auth instance */
+  get auth() { return this.fire.auth; }
+  /** Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out */
+  get authState$() { return this.fire.authState; }
+  /** Observable of the currently signed-in user's JWT token used to identify the user to a Firebase service (or null) */
+  get idToken$() {return this.fire.idToken; }
+  /** Observable of the currently signed-in user (or null) */
+  get user$() { return this.fire.user; }
+
+  // Persists a User object snapshot
+
   /** User object snapshot */
   public user: User = null;
   private sub: Subscription;
-  
-  /** User object observable */
-  get user$(): Observable<User|null> {
-    return this.fire.user;
-  }
   
   constructor(readonly fire: AngularFireAuth) {
     // Keeps a snapshot of the current user object
@@ -27,6 +35,8 @@ export class AuthService implements OnDestroy {
   }
 
   ngOnDestroy() { this.sub.unsubscribe(); }
+
+  // Extends the Auth service features
 
   /** Returns true if user is logged in */
   get authenticated(): boolean {
@@ -44,8 +54,8 @@ export class AuthService implements OnDestroy {
   }
 
   /** Sets/Gets the code for the language to be used during the authentication */
-  set language(code: string) { this.fire.auth.languageCode = code; }
-  get language(): string { return this.fire.auth.languageCode; }
+  set language(code: string) { this.auth.languageCode = code; }
+  get language(): string { return this.auth.languageCode; }
 
   /**
    * Registers a new user by email and confirmPasswordReset
@@ -57,7 +67,7 @@ export class AuthService implements OnDestroy {
     
     console.log("Registering a new user: " + email);
     // Create a new user with email and password
-    return this.fire.auth.createUserWithEmailAndPassword(email, password)
+    return this.auth.createUserWithEmailAndPassword(email, password)
       // Update the user info with the given name
       .then( credential => credential.user.updateProfile({ displayName: name } as User));
   }
@@ -72,7 +82,7 @@ export class AuthService implements OnDestroy {
     
     console.log("Signing in as: " + email);
 
-    return this.fire.auth.signInWithEmailAndPassword(email, password)
+    return this.auth.signInWithEmailAndPassword(email, password)
       .then( credential => credential.user );
   }
 
@@ -131,14 +141,14 @@ export class AuthService implements OnDestroy {
       });
     }
 
-    return this.fire.auth.signInWithPopup(authProvider)
+    return this.auth.signInWithPopup(authProvider)
       .then( credential => credential.user );
   }
 
   /** Signs out */
   public signOut(): Promise<void> {
     console.log("Signing-out");
-    return this.fire.auth.signOut();
+    return this.auth.signOut();
   }
 
   /**
@@ -159,7 +169,7 @@ export class AuthService implements OnDestroy {
   public applyActionCode(code: string): Promise<void> {
 
     console.log("Applying action with code: " + code);
-    return this.fire.auth.applyActionCode(code);
+    return this.auth.applyActionCode(code);
   }
 
   /**
@@ -171,7 +181,7 @@ export class AuthService implements OnDestroy {
     console.log("Resetting the password for: " + email);
     // Send a password reset email
     return this.authenticated ? 
-      this.fire.auth.sendPasswordResetEmail(email, url ? { url } : undefined ) 
+      this.auth.sendPasswordResetEmail(email, url ? { url } : undefined ) 
         : Promise.resolve();
   }
 
@@ -180,7 +190,7 @@ export class AuthService implements OnDestroy {
 
     console.log("Confirming the password with code: " + code);
     // Resets to a new password applying the received activation code
-    return this.fire.auth.confirmPasswordReset(code, newPassword);
+    return this.auth.confirmPasswordReset(code, newPassword);
   }
 
 /*

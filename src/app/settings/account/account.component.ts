@@ -10,18 +10,19 @@ import { Observable } from 'rxjs';
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']
 })
-export class AccountComponent extends DatabaseDocument<dbUser> {
+export class AccountComponent {
+
+  private document: DatabaseDocument<dbUser>;
 
   readonly created$: Observable<Date>;
 
   get auth() { return this.guard.auth; }
   get user() { return this.auth.user || {} as User };
 
-  constructor(readonly guard: AuthGuard, db: DatabaseService) { 
-    super(db, 'users', guard.userId);
+  constructor(readonly guard: AuthGuard, private db: DatabaseService) { 
+    
+     this.document = db.document(`users/${guard.userId}`);
 
-    this.created$ = this.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
+    this.created$ = this.document.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
   }
-
-
 }

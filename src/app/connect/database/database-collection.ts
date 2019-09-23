@@ -1,24 +1,25 @@
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { DatabaseService, dbCollectionRef, dbStreamFn } from './database.service';
 import { DatabaseDocument, dbCommon } from './database-document';
-import { Observable, of, from } from 'rxjs';
-import { map, mergeMap, expand, takeWhile } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, from } from 'rxjs';
+import { map, mergeMap,switchMap, expand, takeWhile } from 'rxjs/operators';
 
 /** Collection object in the database, created by the DatabaseService */
 export class DatabaseCollection<T extends dbCommon> {
 
-  constructor(readonly db: DatabaseService, public path: string) { }
+  constructor(readonly db: DatabaseService, readonly ref: dbCollectionRef) {}
 
   /** Helper returing the collection reference for internal use */
-  public col(sf?: dbStreamFn): dbCollectionRef<T> {
-    return this.db.col<T>(this.path, sf);
+  public col(sf?: dbStreamFn) {
+    return this.db.afs.collection(this.ref, sf);
   }
 
   /**
    * Returns the requested child document
    * @param id the document id
    */
-  public document<D extends dbCommon = T>(id: string): DatabaseDocument<D> {
-   return this.db.document<D>(this.path, id);
+  public document<D extends dbCommon = T>(path?: string): DatabaseDocument<D> {
+   return this.db.document<D>( this.ref.doc(path) );
   }
 
   /**
@@ -27,10 +28,10 @@ export class DatabaseCollection<T extends dbCommon> {
    */
   public add(data: T): Promise<DatabaseDocument<T>> {
     const timestamp = this.db.timestamp;
-    return this.col().add({
+    return this.ref.add({
       ...data as any,
       created: timestamp
-    }).then( ref => this.db.document<T>(this.path, ref.id) );
+    }).then( ref => this.db.document<T>(ref) );
   }
 
   /**
@@ -39,15 +40,18 @@ export class DatabaseCollection<T extends dbCommon> {
    * @param sf the optional filtering funciton
    */
   public get(sf?: dbStreamFn): Promise<T[]> {
-    return this.col(sf).get()
-      .pipe( map( snapshot => {
+    // Assosiates the query to the collection ref, if any
+    const ref = !!sf ? sf(this.ref) : this.ref;
+    // Gets the document snapshot
+    return ref.get().then( snapshot => { 
+        // Maps the snapshot in the dbCommon-like content
         const docs = snapshot.docs;
         return docs.map( doc => {
           const data = doc.data();
           const id = doc.id;
           return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
         });
-      })).toPromise();
+    });
   }
 
   /**
@@ -56,7 +60,9 @@ export class DatabaseCollection<T extends dbCommon> {
    * @param sf the optional filtering funciton
    */
   public stream(sf?: dbStreamFn): Observable<T[]> {
+    // Gets a snapshotChanges observable using AungularFirestoreColleciton
     return this.col(sf).snapshotChanges()
+      // Than maps the snapshot to the dbCommon-like content
       .pipe( map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
@@ -92,7 +98,7 @@ export class DatabaseCollection<T extends dbCommon> {
           batch.delete(doc.ref);
         });
         // Commits the batch write and returns the snapshot length
-        return from( batch.commit().then(() => snapshot.size) );
+        return batch.commit().then(() => snapshot.size);
       }));
   }
 }

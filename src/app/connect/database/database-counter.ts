@@ -15,13 +15,10 @@ export class DistributedCounter extends DatabaseCollection<CounterShard> {
   /** Observable streaming the counter value */
   readonly counter$: Observable<number>;
   private _counter$: BehaviorSubject<number>; 
-  private ref: firestore.CollectionReference; 
 
-  constructor(db: DatabaseService, path: string, public readonly shards) {
-    super(db, path);
+  constructor(db: DatabaseService, ref: dbCollectionRef, public readonly shards) {
+    super(db, ref);
 
-    // Keeps a ref to the firestore collection for internal use
-    this.ref = this.col().ref;
     // Creates a local copy of the counter 
     this._counter$ = new BehaviorSubject<number>(0);
     // Builds the counter observable merging the local counter with the remote one to improve reactivity

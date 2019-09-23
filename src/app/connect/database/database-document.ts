@@ -1,3 +1,4 @@
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { DatabaseService, dbDocumentRef, dbTimestamp } from './database.service';
 import { DatabaseCollection } from './database-collection';
 import { DistributedCounter } from './database-counter';
@@ -15,26 +16,21 @@ export interface dbCommon {
 /** Document object in the database, created by the DatabaseService */
 export class DatabaseDocument<T extends dbCommon> {
 
-  constructor(readonly db: DatabaseService, public path: string, public id: string) {}
-
-  /** Helper returing the document reference for internal use */
-  public get doc(): dbDocumentRef<T> {
-    return this.db.doc(`${this.path}/${this.id}`);
-  }
+  constructor(readonly db: DatabaseService, readonly ref: dbDocumentRef) {}
 
   /** Returns the parent collection */
   public get parent(): DatabaseCollection<T> {
-    return this.db.collection<T>(this.path);
+    return this.db.collection<T>( this.ref.parent );
   }
 
   /** Returns a child collection */
-  public collection<C extends dbCommon>(name: string): DatabaseCollection<C> {
-    return this.db.collection<C>(`${this.path}/${this.id}/${name}`);
+  public collection<C extends dbCommon>(path: string): DatabaseCollection<C> {
+    return this.db.collection<C>( this.ref.collection(path) );
   }
 
   /** Returns a child distributed counter */
-  public counter(name: string, shards?: number): DistributedCounter {
-    return this.db.distributedCounter(`${this.path}/${this.id}/${name}`, shards);
+  public counter(path: string, shards?: number): DistributedCounter {
+    return this.db.counter( this.ref.collection(path), shards);
   }
   
   /**
@@ -43,7 +39,7 @@ export class DatabaseDocument<T extends dbCommon> {
    */
   public set(data: T): Promise<void> {
     const timestamp = this.db.timestamp;
-    return this.doc.set({
+    return this.ref.set({
       ...data as any,
       created: timestamp
     } as T);
@@ -55,7 +51,7 @@ export class DatabaseDocument<T extends dbCommon> {
    */
   public merge(data: T): Promise<void> {
     const timestamp = this.db.timestamp;
-    return this.doc.set({
+    return this.ref.set({
       ...data as any,
       updated: timestamp
     } as T, { merge: true } );
@@ -67,7 +63,7 @@ export class DatabaseDocument<T extends dbCommon> {
    */
   public update(data: T): Promise<void> {
     const timestamp = this.db.timestamp;
-    return this.doc.update({
+    return this.ref.update({
       ...data as any,
       updated: timestamp
     } as T);
@@ -75,7 +71,7 @@ export class DatabaseDocument<T extends dbCommon> {
 
   /** Check for document existance */
   public exists(): Promise<boolean> {
-    return this.doc.ref.get(undefined)
+    return this.ref.get(undefined)
       .then(snap => snap.exists);
   }
 
@@ -91,16 +87,16 @@ export class DatabaseDocument<T extends dbCommon> {
 
   /** Returns the document content immediately */
   public get(): Promise<T> {
-    return this.doc.get().pipe( map( snapshot => {
+    return this.ref.get().then( snapshot => {
       const data = snapshot.data();
       const id = snapshot.id;
       return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
-    })).toPromise();
+    });
   }
 
   /** Streams the document content with an observable */
   public stream(): Observable<T> {
-    return this.doc.snapshotChanges().pipe( map( snapshot => {
+    return this.db.afs.doc<T>(this.ref).snapshotChanges().pipe( map( snapshot => {
       const data = snapshot.payload.data();
       const id = snapshot.payload.id;
       return ( (typeof data !== 'undefined') ? { ...data as any, id } : undefined );
@@ -109,6 +105,6 @@ export class DatabaseDocument<T extends dbCommon> {
 
   /** Deletes the document */
   public delete(): Promise<void> {
-    return this.doc.delete();
+    return this.ref.delete();
   }
 }

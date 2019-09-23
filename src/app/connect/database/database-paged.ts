@@ -1,5 +1,5 @@
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { DatabaseService, dbStreamFn } from './database.service';
+import { DatabaseService, dbCollectionRef, dbStreamFn } from './database.service';
 import { DatabaseCollection } from './database-collection';
 import { Observable, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { map, scan, tap } from 'rxjs/operators';
@@ -36,8 +36,8 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
   protected _done$ = new BehaviorSubject<boolean>(false);
   public done$: Observable<boolean> = this._done$.asObservable();
 
-  constructor(db: DatabaseService, path: string) { 
-    super(db, path);
+  constructor(db: DatabaseService, ref: dbCollectionRef) { 
+    super(db, ref);
   }
 
   // Merges page configuration default values with the optional ones
@@ -109,8 +109,9 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
     if(this._done$.value || this._loading$.value) { return };
     // Sets the loading status
     this._loading$.next(true);
+
     // Gets the next page and pushes it into the data stream
-    this.col(this.queryPage(limit)).get().subscribe( (page: QuerySnapshot<T>) => {
+    this.queryPage(limit)(this.ref).get().then( (page: QuerySnapshot<T>) => {
       // Notifies when done
       if(page.size === 0) {
         this._loading$.next(false);

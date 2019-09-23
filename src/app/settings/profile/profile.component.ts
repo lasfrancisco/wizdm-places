@@ -11,15 +11,18 @@ import { map } from 'rxjs/operators';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent extends DatabaseDocument<dbUser> {
+export class ProfileComponent {
+
+  private document: DatabaseDocument<dbUser>;
 
   readonly photo$: Observable<string>;
   readonly form: FormGroup;
 
   get user() { return this.auth.user || {} as User };
 
-  constructor(private auth: AuthService, db: DatabaseService, private storage: StorageService, private builder: FormBuilder) { 
-    super(db, 'users', auth.userId);
+  constructor(private auth: AuthService,private db: DatabaseService, private storage: StorageService, private builder: FormBuilder) {
+
+    this.document = db.document(`users/${auth.userId}`);
 
     // Builds the form controls group
     this.form = builder.group({
@@ -33,18 +36,18 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     this.load().then( data => this.form.patchValue(data) ); 
 
     // Streams the profile photo
-    this.photo$ = this.stream().pipe( map( profile => !!profile ? profile.photo : '') );
+    this.photo$ = this.document.stream().pipe( map( profile => !!profile ? profile.photo : '') );
   }
 
   // Loads the profile creating a default one when missing
   public load(): Promise<dbUser> {
 
     // Checks for a profile document
-    return this.exists().then( exists => {
+    return this.document.exists().then( exists => {
       // Whenever the profile doesn't exist...
       if(!exists) { 
         // Creates a profile from the user account object
-        return this.set({
+        return this.document.set({
 
           name: this.user.displayName,
           email: this.user.email,
@@ -55,13 +58,13 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
       }
     })
     // Loads the profile content
-    .then( () => this.get() );
+    .then( () => this.document.get() );
   }
 
   // Updates the profile
   public save(): Promise<void> { 
 
-    return this.update(this.form.value)
+    return this.document.update(this.form.value)
       .then( () => this.form.markAsPristine() );
   }
 
@@ -72,11 +75,11 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     if(!file) { return Promise.resolve(null); }
 
     // Creates the uploading task, this will display the progress bar in the view
-    return ( this.uploadTask = this.storage.upload(`${this.id}/${file.name}`, file) )
+    return ( this.uploadTask = this.storage.upload(`${this.auth.userId}/${file.name}`, file) )
       // Returns the url
       .then( snap => snap.ref.getDownloadURL() )
       // Updates the profile with the new url
-      .then( photo => this.update({ photo }) )
+      .then( photo => this.document.update({ photo }) )
       // Deletes the task object removing the progress bar from the view
       .then( () => (delete this.uploadTask, null) );
   }
@@ -86,12 +89,12 @@ export class ProfileComponent extends DatabaseDocument<dbUser> {
     // Deletes the file in the storage first
     return this.deleteFile()
       // Resets the photo url into the profile
-      .then( () => this.update({ photo: '' }) );
+      .then( () => this.document.update({ photo: '' }) );
   }
 
   private deleteFile(): Promise<void> {
     // Reads the profile to get the photo url
-    return this.get().then( profile => {
+    return this.document.get().then( profile => {
       // Skips then no file
       if(!profile || !profile.photo) { return null; }
       // Gets the storage ref from the url...

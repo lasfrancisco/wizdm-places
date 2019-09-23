@@ -41,7 +41,7 @@ export class AppComponent implements OnInit {
 
         if(!user) { return of(''); }
 
-        return this.db.document<dbUser>('users', user.uid).stream()
+        return this.db.document<dbUser>(`users/${user.uid}`).stream()
           .pipe( map( profile => !!profile ? profile.name : '') );
       }))
   }
