@@ -26,6 +26,10 @@ export class AccountComponent {
     this.created$ = this.document.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
   }
 
+  public sendEmailVerification() {
+    
+  }
+
   public deleteAccount() {
 
     // Prompts the user to confirm the deletion by re-authenticating
