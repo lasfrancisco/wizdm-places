@@ -16,10 +16,10 @@ export const $pages = {
       message: "We'll be sending a link to reset the password to your email",
       caption: 'Reset the password' 
     },
-    resetPassword: {// Reset to a new password page (2nd step after forgotPassword)
+    /*resetPassword: {// Reset to a new password page (2nd step after forgotPassword)
       title: 'New password',
       caption: 'Change the password' 
-    },
+    },*/
     changePassword: {// Change the password (while authenticated)
       title: 'Change password',
       message: "Please confirm by re-authenticating",
@@ -29,19 +29,6 @@ export const $pages = {
       title: 'Change email',
       message: "Please confirm by re-authenticating",
       caption: 'Change your email'
-    },
-    verifyEmail: {// Verify the email 
-      title: "Email verification",
-      message: "We'll be sending a link to verify your email",
-      caption: 'Send email verification'
-    },
-    confirmEmail: {// Confirm the email verification
-      title: "Email verification",
-      message: "Thank you for verifying your email. You might need to sign-in again before seeing the effects"
-    },
-    recoverEmail: {// Change the email 
-      title: "Email recovery",
-      message: "Your previous email has been restored. We recommend changing your password the soonest"
     },
     delete: {// Delete the user account
       title: 'Delete account',
