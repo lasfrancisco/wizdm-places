@@ -31,7 +31,10 @@ export class AccountComponent {
 
   public sendEmailVerification() {
 
-    return this.auth.sendEmailVerification(this.router.url);
+    //console.log(this.router.location);
+
+    return this.auth.sendEmailVerification()//this.router.url)
+      .catch( e => console.log(e) );
   }
 
   public deleteAccount() {
