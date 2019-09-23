@@ -19,6 +19,6 @@ export class PlacesComponent {
       .paging({ 
         field: 'name',
         limit: 10
-      });*
+      });
   }
 }

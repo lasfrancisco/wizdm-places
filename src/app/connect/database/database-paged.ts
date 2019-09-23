@@ -1,5 +1,5 @@
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { DatabaseService, dbCollectionRef, dbStreamFn } from './database.service';
+import { DatabaseService, dbCollectionRef, dbQuery, dbStreamFn } from './database.service';
 import { DatabaseCollection } from './database-collection';
 import { Observable, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { map, scan, tap } from 'rxjs/operators';
@@ -111,7 +111,7 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
     this._loading$.next(true);
 
     // Gets the next page and pushes it into the data stream
-    this.queryPage(limit)(this.ref).get().then( (page: QuerySnapshot<T>) => {
+    this.queryPage(this.ref).get().then( (page: QuerySnapshot<T>) => {
       // Notifies when done
       if(page.size === 0) {
         this._loading$.next(false);
@@ -127,15 +127,15 @@ export class PagedCollection<T> extends DatabaseCollection<T> {
   }
 
   // Helper to compute the pagination query function according to the current configuration
-  private queryPage(limit: number): dbStreamFn {
-    return ref => {
-      // Order by the configured field (creation dated by default)
-      if(this.config.field) { ref = ref.orderBy(this.config.field, this.config.reverse ? 'desc' : 'asc');}
-      // Limit the request to the page size
-      if(limit || this.config.limit) { ref = ref.limit(limit || this.config.limit);}
-      // Set the starting poit at the current cursor position
-      if(this.cursor) { ref = ref.startAfter(this.cursor);}
-      return ref;
-    }
+  private queryPage(ref: dbCollectionRef|dbQuery): dbCollectionRef|dbQuery {
+    
+    // Order by the configured field (creation dated by default)
+    if(this.config.field) { ref = ref.orderBy(this.config.field, this.config.reverse ? 'desc' : 'asc');}
+    // Limit the request to the page size
+    if(this.config.limit) { ref = ref.limit(this.config.limit);}
+    // Set the starting poit at the current cursor position
+    if(this.cursor) { ref = ref.startAfter(this.cursor); }
+
+    return ref;
   }
 }
