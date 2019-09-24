@@ -7,7 +7,6 @@ import { map } from 'rxjs/operators';
 /** Common document content to extend from */
 export interface dbCommon {
   id?      : string,
-  exists?  : boolean,
   created? : dbTimestamp,
   updated? : dbTimestamp
 }
