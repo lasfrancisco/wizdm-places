@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User/*, DatabaseService, DatabaseDocument*/, StorageService, UploadTask } from '../../connect';
+import { AuthService, User, StorageService, UploadTask } from '../../connect';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { AuthGuard } from '../../utils/auth-guard.service';
-import { UserProfile, dbUser } from '../../utils/user-profile.service';
-//import { dbUser } from '../../app.component';
-import { Observable, of } from 'rxjs';
+import { UserProfile } from '../../utils/user-profile.service';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
@@ -14,16 +12,14 @@ import { map } from 'rxjs/operators';
 })
 export class ProfileComponent {
 
-  //private document: DatabaseDocument<dbUser>;
-
   readonly photo$: Observable<string>;
   readonly form: FormGroup;
 
-  get user() { return this.auth.user || {} as User };
+  get auth(): AuthService { return this.profile.auth; }
 
-  constructor(private auth: AuthService, private profile: UserProfile, private storage: StorageService, private builder: FormBuilder) {
+  get user(): User { return this.auth.user || {} as User };
 
-    //this.document = db.document(`users/${auth.userId}`);
+  constructor(private profile: UserProfile, private storage: StorageService, private builder: FormBuilder) {
 
     // Builds the form controls group
     this.form = builder.group({

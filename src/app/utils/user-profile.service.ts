@@ -19,11 +19,14 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
   public data: dbUser = null;
   private sub: Subscription;
 
+  /** Returns the current authenticated user id */
+  public get uid(): string { return this.auth.userId; } 
+
   constructor(readonly auth: AuthService, db: DatabaseService) {
     // Extends the DatabaseDocument with a null reference
     super(db, null);
 
-    // Persists the user profile snapshot making sure the document reference is up to date
+    // Persists the user profile snapshot making sure the document reference is always up to date
     this.sub = this.stream().subscribe( profile => this.data = profile );
   }
 
@@ -52,6 +55,9 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
     if(!user) { return Promise.reject( new Error("Can't create a profile from a null user object") ); }
 
+    console.log("Creating user profile for: ", user.email);
+
+    // Sets the document content
     return this.fromUser(user).set({
       name: user.displayName,
       email: user.email,
@@ -67,7 +73,9 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
     console.log("Deleting user: ", user.email);
 
+    // Deletes the user profile first
     return this.fromUser(user).delete()
+      // Deletes the user objects next
       .then( () => user.delete() );
   }
 }
