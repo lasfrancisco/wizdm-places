@@ -15,29 +15,29 @@ export interface dbUser extends dbCommon {
 })
 export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
-  /** Profile observable updating according to authentication  */
-  readonly profile$: Observable<dbUser>;
-
   /** Current user profile snapshot */
-  public profile: dbUser = null;
+  public data: dbUser = null;
   private sub: Subscription;
 
   constructor(readonly auth: AuthService, db: DatabaseService) {
     // Extends the DatabaseDocument with a null reference
     super(db, null);
 
-    // Builds the profile observable
-    this.profile$ = this.auth.user$.pipe(
+    // Persists the user profile snapshot making sure the document reference is up to date
+    this.sub = this.stream().subscribe( profile => this.data = profile );
+  }
+
+  // Disposes of the subscription
+  ngOnDestroy() { this.sub.unsubscribe(); }
+
+  // Extends the streaming function to resolve the authenticated user first
+  public stream(): Observable<dbUser> {
+
+     return this.auth.user$.pipe(
       // Resolves the authenticated user attaching the corresponding document reference    
       tap( user => this.ref = !!user ? this.db.doc(`users/${user.uid}`) : null ),
       // Strams the document with the authenticated user profile
-      switchMap( user => !!user ? this.stream() : of(null) )
+      switchMap( user => !!user ? super.stream() : of(null) )
     );
-
-    // Persists the user profile snapshot making sure the document reference is up to date
-    this.sub = this.profile$.subscribe( profile => this.profile );
   }
-
-  ngOnDestroy() { this.sub.unsubscribe(); }
-
 }

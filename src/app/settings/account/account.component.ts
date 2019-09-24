@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService, User, DatabaseService, DatabaseDocument } from '../../connect';
 import { AuthGuard } from '../../utils/auth-guard.service';
-import { dbUser } from '../../app.component';
+import { UserProfile, dbUser } from '../../utils/user-profile.service';
+//import { dbUser } from '../../app.component';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -12,7 +13,7 @@ import { Observable } from 'rxjs';
 })
 export class AccountComponent {
 
-  private document: DatabaseDocument<dbUser>;
+  //private document: DatabaseDocument<dbUser>;
 
   readonly created$: Observable<Date>;
 
@@ -22,11 +23,11 @@ export class AccountComponent {
   
   get user() { return this.auth.user || {} as User };
 
-  constructor(readonly guard: AuthGuard, private db: DatabaseService) { 
+  constructor(readonly guard: AuthGuard, private profile: UserProfile) { 
     
-     this.document = db.document(`users/${guard.userId}`);
+     //this.document = db.document(`users/${guard.userId}`);
 
-    this.created$ = this.document.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
+    this.created$ = this.profile.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
   }
 
   public sendEmailVerification() {
@@ -47,7 +48,7 @@ export class AccountComponent {
         if(!user) { return null; }
 
         // Deletes the profile document first
-        return this.document.delete()
+        return this.profile.delete()
           // Deletes the account object next
           .then( () => this.user.delete() )
           // Navigates to home when done

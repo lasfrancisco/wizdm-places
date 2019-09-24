@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { MatIconRegistry } from '@angular/material';
-import { AuthService, User, DatabaseService, DatabaseDocument, dbCommon } from './connect';
+//import { AuthService, User, DatabaseService, DatabaseDocument, dbCommon } from './connect';
 import { AuthGuard } from './utils/auth-guard.service';
-import { map, switchMap } from 'rxjs/operators';
-import { of, Observable } from 'rxjs';
+import { UserProfile } from './utils/user-profile.service';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-export interface dbUser extends dbCommon {
+/*export interface dbUser extends dbCommon {
   name?    : string,
   email?   : string,
   photo?   : string,
   bio?     : string
-};
+};*/
 
 @Component({
   selector: 'body',
@@ -29,21 +30,16 @@ export class AppComponent implements OnInit {
   ];
 
   get authenticated() { return this.guard.authenticated; }
-
+/*
   get auth(): AuthService { return this.guard.auth; }
 
   get user(): User { return this.auth.user || {} as User }; 
+*/
+  constructor(readonly guard: AuthGuard, private profile: UserProfile, private icon: MatIconRegistry) {
 
-  constructor(readonly guard: AuthGuard, private db: DatabaseService, private icon: MatIconRegistry) {
-
-    this.userName$ = this.auth.user$
-      .pipe( switchMap( user => {
-
-        if(!user) { return of(''); }
-
-        return this.db.document<dbUser>(`users/${user.uid}`).stream()
-          .pipe( map( profile => !!profile ? profile.name : '') );
-      }))
+    this.userName$ = this.profile.stream().pipe( 
+      map( data => !!data ? data.name : '')
+    );
   }
 
   ngOnInit() {

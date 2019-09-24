@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User, DatabaseService, DatabaseDocument, StorageService, UploadTask } from '../../connect';
+import { AuthService, User/*, DatabaseService, DatabaseDocument*/, StorageService, UploadTask } from '../../connect';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthGuard } from '../../utils/auth-guard.service';
-import { dbUser } from '../../app.component';
+import { UserProfile, dbUser } from '../../utils/user-profile.service';
+//import { dbUser } from '../../app.component';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -13,16 +14,16 @@ import { map } from 'rxjs/operators';
 })
 export class ProfileComponent {
 
-  private document: DatabaseDocument<dbUser>;
+  //private document: DatabaseDocument<dbUser>;
 
   readonly photo$: Observable<string>;
   readonly form: FormGroup;
 
   get user() { return this.auth.user || {} as User };
 
-  constructor(private auth: AuthService,private db: DatabaseService, private storage: StorageService, private builder: FormBuilder) {
+  constructor(private auth: AuthService, private profile: UserProfile, private storage: StorageService, private builder: FormBuilder) {
 
-    this.document = db.document(`users/${auth.userId}`);
+    //this.document = db.document(`users/${auth.userId}`);
 
     // Builds the form controls group
     this.form = builder.group({
@@ -36,18 +37,18 @@ export class ProfileComponent {
     this.load().then( data => this.form.patchValue(data) ); 
 
     // Streams the profile photo
-    this.photo$ = this.document.stream().pipe( map( profile => !!profile ? profile.photo : '') );
+    this.photo$ = this.profile.stream().pipe( map( profile => !!profile ? profile.photo : '') );
   }
 
   // Loads the profile creating a default one when missing
   public load(): Promise<dbUser> {
 
     // Checks for a profile document
-    return this.document.exists().then( exists => {
+    return this.profile.exists().then( exists => {
       // Whenever the profile doesn't exist...
       if(!exists) { 
         // Creates a profile from the user account object
-        return this.document.set({
+        return this.profile.set({
 
           name: this.user.displayName,
           email: this.user.email,
@@ -58,13 +59,13 @@ export class ProfileComponent {
       }
     })
     // Loads the profile content
-    .then( () => this.document.get() );
+    .then( () => this.profile.get() );
   }
 
   // Updates the profile
   public save(): Promise<void> { 
 
-    return this.document.update(this.form.value)
+    return this.profile.update(this.form.value)
       .then( () => this.form.markAsPristine() );
   }
 
@@ -79,7 +80,7 @@ export class ProfileComponent {
       // Returns the url
       .then( snap => snap.ref.getDownloadURL() )
       // Updates the profile with the new url
-      .then( photo => this.document.update({ photo }) )
+      .then( photo => this.profile.update({ photo }) )
       // Deletes the task object removing the progress bar from the view
       .then( () => (delete this.uploadTask, null) );
   }
@@ -89,12 +90,12 @@ export class ProfileComponent {
     // Deletes the file in the storage first
     return this.deleteFile()
       // Resets the photo url into the profile
-      .then( () => this.document.update({ photo: '' }) );
+      .then( () => this.profile.update({ photo: '' }) );
   }
 
   private deleteFile(): Promise<void> {
     // Reads the profile to get the photo url
-    return this.document.get().then( profile => {
+    return this.profile.get().then( profile => {
       // Skips then no file
       if(!profile || !profile.photo) { return null; }
       // Gets the storage ref from the url...
