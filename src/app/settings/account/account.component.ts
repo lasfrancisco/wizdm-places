@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User, DatabaseService, DatabaseDocument } from '../../connect';
+import { AuthService, User } from '../../connect';
 import { AuthGuard } from '../../utils/auth-guard.service';
-import { UserProfile, dbUser } from '../../utils/user-profile.service';
-//import { dbUser } from '../../app.component';
+import { UserProfile } from '../../utils/user-profile.service';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -13,19 +12,13 @@ import { Observable } from 'rxjs';
 })
 export class AccountComponent { 
 
-  //private document: DatabaseDocument<dbUser>;
-
   readonly created$: Observable<Date>;
-
-  get router() { return this.guard.router; }
 
   get auth() { return this.guard.auth; }
   
   get user() { return this.auth.user || {} as User };
 
-  constructor(readonly guard: AuthGuard, private profile: UserProfile) { 
-    
-     //this.document = db.document(`users/${guard.userId}`);
+  constructor(private guard: AuthGuard, private profile: UserProfile) { 
 
     this.created$ = this.profile.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
   }
@@ -38,19 +31,22 @@ export class AccountComponent {
       .catch( e => console.log(e) );
   }
 
+  public changeEmail() {
+
+    this.guard.prompt('changeEmail')
+      .then( user => { });
+  }
+
+  public changePassword() {
+
+    this.guard.prompt('changePassword')
+      .then( user => { });
+  }
+
   public deleteAccount() {
 
-    // Prompts the user to confirm the deletion by re-authenticating
     this.guard.prompt('delete')
-      .then( user  => {
-
-        // Skips to proceed on fail/abort
-        if(!user) { return null; }
-
-        // Deletes the account
-        return this.profile.deleteAccount(user)
-          // Navigates to home when done
-          .then( () => this.router.navigate(['/'] ));
-      });
+      .then( user => { });
   }
+
 }

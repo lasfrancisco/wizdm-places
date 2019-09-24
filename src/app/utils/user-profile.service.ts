@@ -30,6 +30,7 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
   // Disposes of the subscription
   ngOnDestroy() { this.sub.unsubscribe(); }
 
+  // Creates the firestore document reference from the User object 
   private fromUser(user: User): this {
     this.ref = !!user ? this.db.doc(`users/${user.uid}`) : null;
     return this;
@@ -46,6 +47,7 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
     );
   }
 
+  /** Creates the user profile from a User object */
   public createProfile(user: User): Promise<void> {
 
     if(!user) { return Promise.reject( new Error("Can't create a profile from a null user object") ); }
@@ -58,9 +60,12 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
     });
   }
 
+  /** Deletes the account related to the given User object */
   public deleteAccount(user: User): Promise<void> {
 
     if(!user) { return Promise.reject( new Error("Can't delete an account from a null user object") ); }
+
+    console.log("Deleting user: ", user.email);
 
     return this.fromUser(user).delete()
       .then( () => user.delete() );

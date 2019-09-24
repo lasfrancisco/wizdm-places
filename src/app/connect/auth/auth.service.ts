@@ -8,7 +8,9 @@ export { User } from 'firebase';
 
 @Injectable()
 /** Wraps the AngularFireAuth service for extended functionalities */
-export class AuthService implements OnDestroy {
+export class AuthService {
+
+    constructor(readonly fire: AngularFireAuth) {}
 
   // Wraps AngularFireAuth basic functionalities
 
@@ -21,21 +23,9 @@ export class AuthService implements OnDestroy {
   /** Observable of the currently signed-in user (or null) */
   public get user$() { return this.fire.user; }
 
-  // Persists a User object snapshot
-
-  /** User object snapshot */
-  public user: User = null;
-  private sub: Subscription;
+  /** Current user object snapshot */
+  public get user() { return this.auth.currentUser; }
   
-  constructor(readonly fire: AngularFireAuth) {
-    // Keeps a snapshot of the current user object
-    this.sub = this.user$.subscribe( user => {
-      this.user = user;
-    });
-  }
-
-  ngOnDestroy() { this.sub.unsubscribe(); }
-
   // Extends the Auth service features
 
   /** Returns true if user is logged in */
@@ -81,7 +71,7 @@ export class AuthService implements OnDestroy {
    */
   public signIn(email: string, password: string): Promise<User>  {
     
-    console.log("Signing in as: " + email);
+    console.log("Signing in as: ", email);
 
     return this.auth.signInWithEmailAndPassword(email, password)
       .then( credential => credential.user );
@@ -109,7 +99,7 @@ export class AuthService implements OnDestroy {
    */
   public signInWith(provider: string): Promise<User> {
 
-    console.log("Signing-in using: " + provider);
+    console.log("Signing-in using: ", provider);
 
     let authProvider = null;
 
@@ -168,7 +158,7 @@ export class AuthService implements OnDestroy {
   /** Applies the received action code to complete the requested action */
   public applyActionCode(code: string): Promise<void> {
 
-    console.log("Applying action with code: " + code);
+    console.log("Applying action with code: ", code);
     return this.auth.applyActionCode(code);
   }
 
@@ -178,7 +168,7 @@ export class AuthService implements OnDestroy {
    */
   public sendPasswordResetEmail(email: string, url?: string): Promise<void> {
     
-    console.log("Resetting the password for: " + email);
+    console.log("Resetting the password for: ", email);
     // Send a password reset email
     return this.authenticated ? 
       this.auth.sendPasswordResetEmail(email, url ? { url } : undefined ) 
@@ -188,7 +178,7 @@ export class AuthService implements OnDestroy {
   /** Confirms the new password completing a reset */
   public confirmPasswordReset(code: string, newPassword: string): Promise<void> {
 
-    console.log("Confirming the password with code: " + code);
+    console.log("Confirming the password with code: ", code);
     // Resets to a new password applying the received activation code
     return this.auth.confirmPasswordReset(code, newPassword);
   }
