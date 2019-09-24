@@ -6,7 +6,7 @@ import { map, mergeMap, expand, takeWhile } from 'rxjs/operators';
 /** Collection object in the database, created by the DatabaseService */
 export class DatabaseCollection<T extends dbCommon> {
 
-  constructor(readonly db: DatabaseService, readonly ref: dbCollectionRef) {}
+  constructor(readonly db: DatabaseService, public ref: dbCollectionRef) {}
 
   /** Helper returing the collection reference for internal use */
   public col(qf?: dbQueryFn) {

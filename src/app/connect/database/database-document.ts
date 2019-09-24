@@ -15,7 +15,7 @@ export interface dbCommon {
 /** Document object in the database, created by the DatabaseService */
 export class DatabaseDocument<T extends dbCommon> {
 
-  constructor(readonly db: DatabaseService, readonly ref: dbDocumentRef) {}
+  constructor(readonly db: DatabaseService, public ref: dbDocumentRef) {}
 
   /** Returns the parent collection */
   public get parent(): DatabaseCollection<T> {

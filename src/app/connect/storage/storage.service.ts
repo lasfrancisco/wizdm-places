@@ -25,12 +25,12 @@ export class StorageService {
   /** Returns a reference to the storage object identified by its path */
   public ref(path: string|stReference): StorageReference {
     const ref = typeof path === 'string' ? this.storage.ref(path) : path;
-    return new StorageReference(ref, this);
+    return new StorageReference(this, ref);
   }
 
   /** Returns a reference to the storage object identified by its download URL */
   public refFromURL(url: string): StorageReference {
-    return new StorageReference( this.storage.refFromURL(url), this);
+    return new StorageReference(this, this.storage.refFromURL(url));
   }
 
   /** Shortcut to start an upload task of binary data */

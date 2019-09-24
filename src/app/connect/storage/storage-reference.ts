@@ -4,7 +4,7 @@ import { UploadTask } from './upload-task';
 /** Wraps the AngularFireStorageReference including list() and listAll() functionalities recently added to firebase API */
 export class StorageReference {
 
-  constructor(readonly ref: stReference, readonly st: StorageService) {}
+  constructor(readonly st: StorageService, public ref: stReference) {}
 
   /** Returns a reference to a child item */
   public child(path: string): StorageReference { 
