@@ -98,7 +98,7 @@ export class AuthService implements OnDestroy {
     // Gets fresh credentials for the current user
     const credential = auth.EmailAuthProvider.credential(this.user.email, password);
     // Re-authenticate the user with the fresh credentials
-    return this.user.reauthenticateAndRetrieveDataWithCredential(credential)
+    return this.user.reauthenticateWithCredential(credential)
       .then( credential => credential.user );
   }
 

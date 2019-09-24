@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']
 })
-export class AccountComponent {
+export class AccountComponent { 
 
   //private document: DatabaseDocument<dbUser>;
 

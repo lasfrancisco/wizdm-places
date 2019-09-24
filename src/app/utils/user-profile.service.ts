@@ -30,8 +30,8 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
   // Disposes of the subscription
   ngOnDestroy() { this.sub.unsubscribe(); }
 
-  private fromId(id: string): this {
-    this.ref = !!id ? this.db.doc(`users/${id}`) : null;
+  private fromUser(user: User): this {
+    this.ref = !!user ? this.db.doc(`users/${user.uid}`) : null;
     return this;
   }
 
@@ -40,7 +40,7 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
      return this.auth.user$.pipe(
       // Resolves the authenticated user attaching the corresponding document reference    
-      tap( user => this.fromId(user.uid) ),
+      tap( user => this.fromUser(user) ),
       // Strams the document with the authenticated user profile
       switchMap( user => !!user ? super.stream() : of(null) )
     );
@@ -50,7 +50,7 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
     if(!user) { return Promise.reject( new Error("Can't create a profile from a null user object") ); }
 
-    return this.fromId(user.uid).set({
+    return this.fromUser(user).set({
       name: user.displayName,
       email: user.email,
       photo: user.photoURL,
@@ -62,7 +62,7 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
     if(!user) { return Promise.reject( new Error("Can't delete an account from a null user object") ); }
 
-    return this.fromId(user.uid).delete()
+    return this.fromUser(user).delete()
       .then( () => user.delete() );
   }
 }
