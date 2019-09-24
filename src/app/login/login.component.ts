@@ -2,7 +2,6 @@ import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-//import { AuthService, User } from '../connect';
 import { UserProfile, dbUser } from '../utils/user-profile.service';
 import { $animations } from './login-animations';
 import { $providers } from './login-providers';
