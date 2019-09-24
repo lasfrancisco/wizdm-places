@@ -38,7 +38,7 @@ export class AuthService {
     return this.authenticated ? this.user.uid : '';
   }
 
-   /** Returns true whenever the current user email has been verified */
+  /** Returns true whenever the current user email has been verified */
   public get emailVerified(): boolean {
     return this.authenticated ? this.user.emailVerified : false;
   }
@@ -52,6 +52,7 @@ export class AuthService {
    * @param email the email to register with
    * @param password the secret password
    * @param name (optional) the user name
+   * @returns the authenticated User object
    */
   public registerNew(email: string, password: string, name: string = ""): Promise<User> {
     
@@ -60,7 +61,8 @@ export class AuthService {
     return this.auth.createUserWithEmailAndPassword(email, password)
       // Update the user info with the given name
       .then( credential => credential.user.updateProfile({ displayName: name } as User ) )
-      .then( () => this.auth.currentUser )
+      // Returns the updated User object
+      .then( () => this.user )
   }
 
   /**
@@ -148,11 +150,10 @@ export class AuthService {
    */
   public sendEmailVerification(url?: string): Promise<void> {
 
-    console.log("Send email veriication");
-    
-    return this.authenticated ? 
-      this.user.sendEmailVerification( url ? { url } : undefined ) 
-        : Promise.resolve();
+    if(!this.user) { return Promise.reject( new Error("Authentication required") ); }
+
+    console.log("Send email verification");
+    return this.user.sendEmailVerification( url ? { url } : undefined );
   }
   
   /** Applies the received action code to complete the requested action */
@@ -169,17 +170,13 @@ export class AuthService {
   public sendPasswordResetEmail(email: string, url?: string): Promise<void> {
     
     console.log("Resetting the password for: ", email);
-    // Send a password reset email
-    return this.authenticated ? 
-      this.auth.sendPasswordResetEmail(email, url ? { url } : undefined ) 
-        : Promise.resolve();
+    return this.auth.sendPasswordResetEmail(email, url ? { url } : undefined );
   }
 
   /** Confirms the new password completing a reset */
   public confirmPasswordReset(code: string, newPassword: string): Promise<void> {
 
     console.log("Confirming the password with code: ", code);
-    // Resets to a new password applying the received activation code
     return this.auth.confirmPasswordReset(code, newPassword);
   }
 }
