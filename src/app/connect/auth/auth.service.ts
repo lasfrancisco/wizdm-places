@@ -63,13 +63,14 @@ export class AuthService implements OnDestroy {
    * @param password the secret password
    * @param name (optional) the user name
    */
-  public registerNew(email: string, password: string, name: string = ""): Promise<void> {
+  public registerNew(email: string, password: string, name: string = ""): Promise<User> {
     
     console.log("Registering a new user: " + email);
     // Create a new user with email and password
     return this.auth.createUserWithEmailAndPassword(email, password)
       // Update the user info with the given name
-      .then( credential => credential.user.updateProfile({ displayName: name } as User));
+      .then( credential => credential.user.updateProfile({ displayName: name } as User ) )
+      .then( () => this.auth.currentUser )
   }
 
   /**

@@ -34,32 +34,10 @@ export class ProfileComponent {
     });
 
     // Loads the profile into the form once 
-    this.load().then( data => this.form.patchValue(data) ); 
+    this.profile.get().then( data => this.form.patchValue(data) ); 
 
     // Streams the profile photo
     this.photo$ = this.profile.stream().pipe( map( profile => !!profile ? profile.photo : '') );
-  }
-
-  // Loads the profile creating a default one when missing
-  public load(): Promise<dbUser> {
-
-    // Checks for a profile document
-    return this.profile.exists().then( exists => {
-      // Whenever the profile doesn't exist...
-      if(!exists) { 
-        // Creates a profile from the user account object
-        return this.profile.set({
-
-          name: this.user.displayName,
-          email: this.user.email,
-          photo: this.user.photoURL,
-          bio: ''
-
-        });
-      }
-    })
-    // Loads the profile content
-    .then( () => this.profile.get() );
   }
 
   // Updates the profile

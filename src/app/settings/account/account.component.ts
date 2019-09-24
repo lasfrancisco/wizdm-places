@@ -47,10 +47,8 @@ export class AccountComponent {
         // Skips to proceed on fail/abort
         if(!user) { return null; }
 
-        // Deletes the profile document first
-        return this.profile.delete()
-          // Deletes the account object next
-          .then( () => this.user.delete() )
+        // Deletes the account
+        return this.profile.deleteAccount(user)
           // Navigates to home when done
           .then( () => this.router.navigate(['/'] ));
       });

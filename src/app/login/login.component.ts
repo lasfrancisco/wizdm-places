@@ -1,8 +1,9 @@
 import { Component, Inject } from '@angular/core';
-import { Router } from '@angular/router';
+//import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { AuthService, User } from '../connect';
+//import { AuthService, User } from '../connect';
+import { UserProfile, dbUser } from '../utils/user-profile.service';
 import { $animations } from './login-animations';
 import { $providers } from './login-providers';
 import { $pages } from './login-pages';
@@ -34,11 +35,10 @@ export class LoginComponent {
   public hidePassword = true;
   public error = null;
   public progress = false;
+
+  get auth() { return this.profile.auth; }
   
-  constructor(private auth: AuthService, 
-              private router: Router, 
-              private ref: MatDialogRef<LoginComponent>, 
-              @Inject(MAT_DIALOG_DATA) private action: loginAction) {
+  constructor(private profile: UserProfile, private ref: MatDialogRef<LoginComponent>, @Inject(MAT_DIALOG_DATA) private action: loginAction) {
 
     // Form controls
     this.name = new FormControl(null, Validators.required);
@@ -149,10 +149,11 @@ export class LoginComponent {
   private registerNew(email: string, password: string,name: string) {
     // Registering a new user with a email/password
     this.auth.registerNew(email, password, name )
-      // Closes the dialog returning the user
-      .then( user => this.ref.close(user) )
-      // Navigates to the profile page for the user to confirm
-      .then( () => this.router.navigate(['/profile']) )
+      // Creates the new user profile
+      .then( user => this.profile.createProfile(user)
+        // Closes the dialog returning the user
+        .then( () => this.ref.close(user) )
+      ) 
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
@@ -214,8 +215,10 @@ export class LoginComponent {
   private deleteAccount(password: string) {
     // Refreshes the authentication
     this.auth.refresh(password)
-      // Closes the dialog returning the user object 
-      .then( user => this.ref.close(user) )
+       // Deletes the user account
+      .then( user => this.profile.deleteAccount(user) )
+      // Closes the dialog returning null
+      .then( () => this.ref.close(null) )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }

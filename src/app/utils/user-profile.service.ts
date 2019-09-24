@@ -30,14 +30,39 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
   // Disposes of the subscription
   ngOnDestroy() { this.sub.unsubscribe(); }
 
+  private fromId(id: string): this {
+    this.ref = !!id ? this.db.doc(`users/${id}`) : null;
+    return this;
+  }
+
   // Extends the streaming function to resolve the authenticated user first
   public stream(): Observable<dbUser> {
 
      return this.auth.user$.pipe(
       // Resolves the authenticated user attaching the corresponding document reference    
-      tap( user => this.ref = !!user ? this.db.doc(`users/${user.uid}`) : null ),
+      tap( user => this.fromId(user.uid) ),
       // Strams the document with the authenticated user profile
       switchMap( user => !!user ? super.stream() : of(null) )
     );
+  }
+
+  public createProfile(user: User): Promise<void> {
+
+    if(!user) { return Promise.reject( new Error("Can't create a profile from a null user object") ); }
+
+    return this.fromId(user.uid).set({
+      name: user.displayName,
+      email: user.email,
+      photo: user.photoURL,
+      bio: ''
+    });
+  }
+
+  public deleteAccount(user: User): Promise<void> {
+
+    if(!user) { return Promise.reject( new Error("Can't delete an account from a null user object") ); }
+
+    return this.fromId(user.uid).delete()
+      .then( () => user.delete() );
   }
 }
