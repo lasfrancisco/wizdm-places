@@ -16,15 +16,18 @@ import { AccountComponent } from './account/account.component';
 import { AuthGuard } from '../utils/auth-guard.service';
 
 const routes: Routes = [
-  { 
-    path: 'settings', component: SettingsComponent, canActivate: [ AuthGuard ],
+  
+  { path: 'profile', redirectTo: 'settings/profile', pathMatch: 'full' },
+  { path: 'account', redirectTo: 'setting/account', pathMatch: 'full' },
+  
+  { path: 'settings', component: SettingsComponent, canActivate: [ AuthGuard ],
     
     children: [
       { path: '', redirectTo: 'profile', pathMatch: 'full' },
       { path: 'profile', component: ProfileComponent },
       { path: 'account', component: AccountComponent }
     ]
-  }
+  } 
 ];
 
 @NgModule({

@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AuthService, User } from '../connect';
@@ -35,16 +35,22 @@ export class LoginComponent {
   public error = null;
   public progress = false;
   
-  constructor(private auth: AuthService, private ref: MatDialogRef<LoginComponent>, @Inject(MAT_DIALOG_DATA) private action: loginAction) {
+  constructor(private auth: AuthService, 
+              private router: Router, 
+              private ref: MatDialogRef<LoginComponent>, 
+              @Inject(MAT_DIALOG_DATA) private action: loginAction) {
 
+    // Form controls
     this.name = new FormControl(null, Validators.required);
     this.email = new FormControl(null, [Validators.required, Validators.email]);
     this.password = new FormControl(null, Validators.required);
     this.newEmail = new FormControl(null, [Validators.required, Validators.email]);
     this.newPassword = new FormControl(null, Validators.required);
 
+    // Empty form group
     this.form = new FormGroup({});
 
+    // Populates the form according to the page
     this.switchPage(this.page = action);
   }
 
@@ -140,11 +146,13 @@ export class LoginComponent {
     }
   }
 
-  private signInWith(provider: string) { 
-    // Signing-in with a provider    
-    this.auth.signInWith( provider )
+  private registerNew(email: string, password: string,name: string) {
+    // Registering a new user with a email/password
+    this.auth.registerNew(email, password, name )
       // Closes the dialog returning the user
       .then( user => this.ref.close(user) )
+      // Navigates to the profile page for the user to confirm
+      .then( () => this.router.navigate(['/profile']) )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
@@ -158,9 +166,9 @@ export class LoginComponent {
       .catch( error => this.showError(error.code) );
   }
 
-  private registerNew(email: string, password: string,name: string) {
-    // Registering a new user with a email/password
-    this.auth.registerNew(email, password, name )
+  private signInWith(provider: string) { 
+    // Signing-in with a provider    
+    this.auth.signInWith( provider )
       // Closes the dialog returning the user
       .then( user => this.ref.close(user) )
       // Dispays the error code, eventually
