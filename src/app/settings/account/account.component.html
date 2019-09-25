@@ -11,9 +11,9 @@
 
   <mat-divider></mat-divider>
 
-  <p>Your email {{ auth.emailVerified ? 'is already verified' : 'is not verified yet. Please proceed at your convenience' }}.</p>
+  <p>Your email {{ emailVerified ? 'is already verified' : 'is not verified yet. Please proceed at your convenience' }}.</p>
 
-  <button mat-stroked-button color="primary" [disabled]="auth.emailVerified" (click)="sendEmailVerification()" fxFlexAlign="start">
+  <button mat-stroked-button color="primary" [disabled]="emailVerified" (click)="sendEmailVerification()" fxFlexAlign="start">
     Verify your email
   </button>
 

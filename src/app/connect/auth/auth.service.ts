@@ -38,11 +38,6 @@ export class AuthService {
     return this.authenticated ? this.user.uid : '';
   }
 
-  /** Returns true whenever the current user email has been verified */
-  public get emailVerified(): boolean {
-    return this.authenticated ? this.user.emailVerified : false;
-  }
-
   /** Sets/Gets the code for the language to be used during the authentication */
   public set language(code: string) { this.auth.languageCode = code; }
   public get language(): string { return this.auth.languageCode; }
