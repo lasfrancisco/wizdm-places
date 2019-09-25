@@ -15,7 +15,8 @@ export class ProfileComponent {
   readonly photo$: Observable<string>;
   readonly form: FormGroup;
 
-  get auth(): AuthService { return this.profile.auth; }
+  // Returns the AuthService
+  private get auth(): AuthService { return this.profile.auth; }
 
   constructor(private profile: UserProfile, private storage: StorageService, private builder: FormBuilder) {
 
