@@ -25,8 +25,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get auth() { return this.profile.auth; } 
 
-  //get router() { return this.guard.router; }
-
   get authenticated() { return this.guard.authenticated; }
 
   constructor(readonly guard: AuthGuard, private profile: UserProfile, readonly router: Router, private icon: MatIconRegistry) {
@@ -43,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.icon.registerFontClassAlias('fontawesome', 'fa');
 
     // Monitors the authState making sure to navigate home whenever the user signs out
+    // including when the account has been deleted
     this.sub = this.auth.authState$.pipe( filter( user => !user ) )
       .subscribe( () => this.router.navigate(['/']) );
   }

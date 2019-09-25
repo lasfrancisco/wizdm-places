@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable, of, forkJoin, Subject } from 'rxjs';
 import { take, switchMap } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { AuthService, User } from '../connect';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(readonly auth: AuthService/*, readonly router: Router*/, private dialog: MatDialog) {}
+  constructor(readonly auth: AuthService, private dialog: MatDialog) {}
 
   /** Returns true whenever the user is authenticated */
   get authenticated() { return this.auth.authenticated; }
@@ -38,11 +38,9 @@ export class AuthGuard implements CanActivate {
     ).toPromise();
   }
 
-  /** Disconnects the user navigating to home */
-  public disconnect(): Promise<void> { //*/jumpTo = '/'): Promise<boolean> {
-
+  /** Disconnects the user */
+  public disconnect(): Promise<void> {
     return this.auth.signOut();
-      //.then( () => this.router.navigateByUrl(jumpTo) );
   }
 
   // Implements single route user authentication guarding

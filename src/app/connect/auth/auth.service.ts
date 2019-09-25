@@ -54,15 +54,16 @@ export class AuthService {
    * @param name (optional) the user name
    * @returns the authenticated User object
    */
-  public registerNew(email: string, password: string, name: string = ""): Promise<User> {
+  public registerNew(email: string, password: string, displayName: string = ""): Promise<User> {
     
     console.log("Registering a new user: " + email);
     // Create a new user with email and password
     return this.auth.createUserWithEmailAndPassword(email, password)
       // Update the user info with the given name
-      .then( credential => credential.user.updateProfile({ displayName: name } as User ) )
-      // Returns the updated User object
-      .then( () => this.user )
+      .then( credential => credential.user.updateProfile({ displayName })
+        // Returns the updated User object
+        .then( () => credential.user )
+      );
   }
 
   /**

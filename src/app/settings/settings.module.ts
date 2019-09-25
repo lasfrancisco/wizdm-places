@@ -18,7 +18,7 @@ import { AuthGuard } from '../utils/auth-guard.service';
 const routes: Routes = [
   
   { path: 'profile', redirectTo: 'settings/profile', pathMatch: 'full' },
-  { path: 'account', redirectTo: 'setting/account', pathMatch: 'full' },
+  { path: 'account', redirectTo: 'settings/account', pathMatch: 'full' },
   
   { path: 'settings', component: SettingsComponent, canActivate: [ AuthGuard ],
     

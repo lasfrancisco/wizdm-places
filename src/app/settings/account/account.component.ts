@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User } from '../../connect';
+import { AuthService } from '../../connect';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { UserProfile } from '../../utils/user-profile.service';
 import { map } from 'rxjs/operators';
@@ -14,9 +14,7 @@ export class AccountComponent {
 
   readonly created$: Observable<Date>;
 
-  get auth() { return this.guard.auth; }
-  
-  get user() { return this.auth.user || {} as User };
+  get auth(): AuthService { return this.guard.auth; }
 
   constructor(private guard: AuthGuard, private profile: UserProfile) { 
 
@@ -25,9 +23,7 @@ export class AccountComponent {
 
   public sendEmailVerification() {
 
-    //console.log(this.router.location);
-
-    return this.auth.sendEmailVerification()//this.router.url)
+    return this.auth.sendEmailVerification()
       .catch( e => console.log(e) );
   }
 
