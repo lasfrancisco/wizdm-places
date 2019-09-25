@@ -11,7 +11,7 @@ import { AuthService, User } from '../connect';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(readonly auth: AuthService, readonly router: Router, private dialog: MatDialog) {}
+  constructor(readonly auth: AuthService/*, readonly router: Router*/, private dialog: MatDialog) {}
 
   /** Returns true whenever the user is authenticated */
   get authenticated() { return this.auth.authenticated; }
@@ -39,10 +39,10 @@ export class AuthGuard implements CanActivate {
   }
 
   /** Disconnects the user navigating to home */
-  public disconnect(jumpTo = '/'): Promise<boolean> {
+  public disconnect(): Promise<void> { //*/jumpTo = '/'): Promise<boolean> {
 
-    return this.auth.signOut()
-      .then( () => this.router.navigateByUrl(jumpTo) );
+    return this.auth.signOut();
+      //.then( () => this.router.navigateByUrl(jumpTo) );
   }
 
   // Implements single route user authentication guarding

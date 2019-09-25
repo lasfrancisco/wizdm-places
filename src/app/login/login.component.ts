@@ -152,10 +152,12 @@ export class LoginComponent {
     // Registering a new user with a email/password
     this.auth.registerNew(email, password, name )
       // Creates the new user profile
-      .then( user => this.profile.createProfile(user)
+      /*.then( user => this.profile.createProfile(user)
         // Closes the dialog returning the user
         .then( () => this.ref.close(user) )
-      ) 
+      ) */
+      // Closes the dialog returning the user
+      .then( user => this.ref.close(user) )
       // Navigates to the profile page for the user to agree on
       .then( () => this.router.navigate(['/settings']) )
       // Dispays the error code, eventually

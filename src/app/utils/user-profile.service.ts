@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { AuthService, User, DatabaseService, DatabaseDocument, dbCommon } from '../connect';
-import { Observable, Subscription, of } from 'rxjs';
+import { Observable, Subscription, of, from } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 export interface dbUser extends dbCommon {
@@ -45,8 +45,26 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
      return this.auth.user$.pipe(
       // Resolves the authenticated user attaching the corresponding document reference    
       tap( user => this.fromUser(user) ),
+      // Initialize the user profile whenever it still doesn't exists 
+      switchMap( user => this.initProfile(user) ),
       // Strams the document with the authenticated user profile
       switchMap( user => !!user ? super.stream() : of(null) )
+    );
+  }
+
+  private initProfile(user: User): Observable<User> {
+
+     if(!user) { return of(null); }
+
+     return from( this.exists() ).pipe(
+
+      switchMap( exists => {
+
+        if(exists) { return of(user); }
+
+        return this.createProfile(user)
+          .then( () => user );
+      })
     );
   }
 
