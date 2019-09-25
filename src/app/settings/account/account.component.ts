@@ -11,15 +11,17 @@ export class AccountComponent {
 
   constructor(private guard: AuthGuard) { }
 
+  // Returns the AuthService 
   get auth(): AuthService { return this.guard.auth; }
-
+  // Returns the curernt User object
   get user(): User { return this.auth.user; }
+  // Return the user's creation time
+  get created(): Date { return new Date(!!this.user ? this.user.metadata.creationTime : null); }
 
-  get created(): Date { return new Date(!!this.user ? this.user.metadata.creationTime : null); }/
-
+  // Sends the user email verification
   public sendEmailVerification() {
 
-    return this.auth.sendEmailVerification()
+    return this.user.sendEmailVerification()
       .catch( e => console.log(e) );
   }
 

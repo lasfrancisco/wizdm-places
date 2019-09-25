@@ -144,18 +144,6 @@ export class AuthService {
     console.log("Signing-out");
     return this.auth.signOut();
   }
-
-  /**
-   * Sends an email to the user to verify the account email
-   * @param url (optional) the link to be passed as the continueUrl query parameter
-   */
-  public sendEmailVerification(url?: string): Promise<void> {
-
-    if(!this.user) { return Promise.reject( new Error("Authentication required") ); }
-
-    console.log("Send email verification");
-    return this.user.sendEmailVerification( url ? { url } : undefined );
-  }
   
   /** Applies the received action code to complete the requested action */
   public applyActionCode(code: string): Promise<void> {
