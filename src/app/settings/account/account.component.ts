@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../connect';
+import { AuthService, User } from '../../connect';
 import { AuthGuard } from '../../utils/auth-guard.service';
-import { UserProfile } from '../../utils/user-profile.service';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'wm-account',
@@ -12,14 +9,13 @@ import { Observable } from 'rxjs';
 })
 export class AccountComponent { 
 
-  readonly created$: Observable<Date>;
+  constructor(private guard: AuthGuard) { }
 
   get auth(): AuthService { return this.guard.auth; }
 
-  constructor(private guard: AuthGuard, private profile: UserProfile) { 
+  get user(): User { return this.auth.user; }
 
-    this.created$ = this.profile.stream().pipe( map( profile => !!profile ? profile.created.toDate() : null ));
-  }
+  get created(): Date { return new Date(!!this.user ? this.user.metadata.creationTime : null); }/
 
   public sendEmailVerification() {
 

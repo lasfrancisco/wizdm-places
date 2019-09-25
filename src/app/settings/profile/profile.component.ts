@@ -17,8 +17,6 @@ export class ProfileComponent {
 
   get auth(): AuthService { return this.profile.auth; }
 
-  get user(): User { return this.auth.user || {} as User };
-
   constructor(private profile: UserProfile, private storage: StorageService, private builder: FormBuilder) {
 
     // Builds the form controls group
