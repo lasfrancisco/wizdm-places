@@ -45,13 +45,11 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
      return this.auth.user$.pipe(
       // Resolves the authenticated user attaching the corresponding document reference    
       tap( user => this.fromUser(user) ),
-      // Initialize the user profile whenever it still doesn't exists 
-      switchMap( user => this.initProfile(user) ),
       // Strams the document with the authenticated user profile
       switchMap( user => !!user ? super.stream() : of(null) )
     );
   }
-
+/*
   private initProfile(user: User): Observable<User> {
 
      if(!user) { return of(null); }
@@ -66,7 +64,7 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
           .then( () => user );
       })
     );
-  }
+  }*/
 
   /** Creates the user profile from a User object */
   public createProfile(user: User): Promise<void> {
@@ -75,13 +73,16 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
 
     console.log("Creating user profile for: ", user.email);
 
-    // Sets the document content
-    return this.fromUser(user).set({
-      name: user.displayName,
-      email: user.email,
-      photo: user.photoURL,
-      bio: ''
-    });
+    // Checks for document existance first
+    return this.fromUser(user).exists()
+      // Sets the document content whenever missing
+      .then( exists => !exists ? this.set({
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL,
+          bio: ''
+        }) : null
+      );
   }
 
   /** Deletes the account related to the given User object */

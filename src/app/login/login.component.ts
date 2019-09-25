@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UserProfile, dbUser } from '../utils/user-profile.service';
@@ -37,10 +36,7 @@ export class LoginComponent {
 
   get auth() { return this.profile.auth; }
   
-  constructor(private profile: UserProfile, 
-              private router: Router, 
-              private ref: MatDialogRef<LoginComponent>, 
-              @Inject(MAT_DIALOG_DATA) private action: loginAction) {
+  constructor(private profile: UserProfile, private ref: MatDialogRef<LoginComponent>, @Inject(MAT_DIALOG_DATA) private action: loginAction) {
 
     // Form controls
     this.name = new FormControl(null, Validators.required);
@@ -152,14 +148,10 @@ export class LoginComponent {
     // Registering a new user with a email/password
     this.auth.registerNew(email, password, name )
       // Creates the new user profile
-      /*.then( user => this.profile.createProfile(user)
+      .then( user => this.profile.createProfile(user)
         // Closes the dialog returning the user
         .then( () => this.ref.close(user) )
-      ) */
-      // Closes the dialog returning the user
-      .then( user => this.ref.close(user) )
-      // Navigates to the profile page for the user to agree on
-      .then( () => this.router.navigate(['/settings']) )
+      )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
@@ -176,8 +168,11 @@ export class LoginComponent {
   private signInWith(provider: string) { 
     // Signing-in with a provider    
     this.auth.signInWith( provider )
-      // Closes the dialog returning the user
-      .then( user => this.ref.close(user) )
+       // Creates the new user profile if needed
+      .then( user => this.profile.createProfile(user)
+        // Closes the dialog returning the user
+        .then( () => this.ref.close(user) )
+      )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }
@@ -219,15 +214,12 @@ export class LoginComponent {
   }
 
   private deleteAccount(password: string) {
-
     // Refreshes the authentication
     this.auth.refresh(password)
        // Deletes the user account
       .then( user => this.profile.deleteAccount(user) )
       // Closes the dialog returning null
       .then( () => this.ref.close(null) )
-      // Navigates home
-      .then( () => this.router.navigate(['/']) )
       // Dispays the error code, eventually
       .catch( error => this.showError(error.code) );
   }

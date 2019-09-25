@@ -31,6 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(readonly guard: AuthGuard, private profile: UserProfile, readonly router: Router, private icon: MatIconRegistry) {
 
+    // Streams the user name from the profile
     this.userName$ = this.profile.stream().pipe( 
       map( data => !!data ? data.name : '')
     );
