@@ -144,11 +144,11 @@ export class LoginComponent {
     }
   }
 
-  private registerNew(email: string, password: string,name: string) {
+  private registerNew(email: string, password: string, name: string) {
     // Registering a new user with a email/password
     this.auth.registerNew(email, password, name )
       // Creates the new user profile
-      .then( user => this.profile.createProfile(user)
+      .then( user => this.profile.register(user)
         // Closes the dialog returning the user
         .then( () => this.ref.close(user) )
       )
@@ -168,8 +168,8 @@ export class LoginComponent {
   private signInWith(provider: string) { 
     // Signing-in with a provider    
     this.auth.signInWith( provider )
-       // Creates the new user profile if needed
-      .then( user => this.profile.createProfile(user)
+       // Creates the new user profile if needed, keeps the existing one otherwise
+      .then( user => this.profile.register(user)
         // Closes the dialog returning the user
         .then( () => this.ref.close(user) )
       )
@@ -216,8 +216,11 @@ export class LoginComponent {
   private deleteAccount(password: string) {
     // Refreshes the authentication
     this.auth.refresh(password)
-       // Deletes the user account
-      .then( user => this.profile.deleteAccount(user) )
+       // Deletes the user profile first
+      .then( user => this.profile.delete()
+        // Deletes the user object next
+        .then( () => user.delete() )
+      )
       // Closes the dialog returning null
       .then( () => this.ref.close(null) )
       // Dispays the error code, eventually

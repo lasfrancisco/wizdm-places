@@ -49,25 +49,9 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
       switchMap( user => !!user ? super.stream() : of(null) )
     );
   }
-/*
-  private initProfile(user: User): Observable<User> {
-
-     if(!user) { return of(null); }
-
-     return from( this.exists() ).pipe(
-
-      switchMap( exists => {
-
-        if(exists) { return of(user); }
-
-        return this.createProfile(user)
-          .then( () => user );
-      })
-    );
-  }*/
 
   /** Creates the user profile from a User object */
-  public createProfile(user: User): Promise<void> {
+  public register(user: User): Promise<void> {
 
     if(!user) { return Promise.reject( new Error("Can't create a profile from a null user object") ); }
 
@@ -83,18 +67,5 @@ export class UserProfile extends DatabaseDocument<dbUser> implements OnDestroy{
           bio: ''
         }) : null
       );
-  }
-
-  /** Deletes the account related to the given User object */
-  public deleteAccount(user: User): Promise<void> {
-
-    if(!user) { return Promise.reject( new Error("Can't delete an account from a null user object") ); }
-
-    console.log("Deleting user: ", user.email);
-
-    // Deletes the user profile first
-    return this.fromUser(user).delete()
-      // Deletes the user objects next
-      .then( () => user.delete() );
   }
 }
