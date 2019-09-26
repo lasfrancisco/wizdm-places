@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { DatabaseService, PagedCollection } from '../connect';
+import { DatabaseService, DatabaseCollection } from '../connect';
 import { dbPlace } from './place/place.component';
 import { Observable } from 'rxjs';
 
@@ -9,17 +9,14 @@ import { Observable } from 'rxjs';
   templateUrl: './places.component.html',
   styleUrls: ['./places.component.scss']
 })
-export class PlacesComponent extends PagedCollection<dbPlace> {
+export class PlacesComponent extends DatabaseCollection<dbPlace> {
 
   readonly places$: Observable<dbPlace[]>;
 
   constructor(db: DatabaseService) { 
-
+    // Constructs the DatabseColleciton referring to 'places'
     super(db, db.col('places'));
-
-    this.places$ = this.paging({ 
-      field: 'name',
-      limit: 10
-    });
+    // Streams the array of places ordering them by ascending names 
+    this.places$ = this.stream( ref => ref.orderBy('name', 'asc') );
   }
 }
