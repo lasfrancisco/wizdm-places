@@ -16,9 +16,7 @@ export interface dbPlace extends dbCommon {
   styleUrls: ['./place.component.scss'],
   animations: $animations
 })
-export class PlaceComponent implements OnDestroy {
-
-  private document: DatabaseDocument<dbPlace>;
+export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestroy {
 
   private _favorite$ = new BehaviorSubject<boolean>(false);
   private favorite$: Observable<boolean>;
@@ -27,7 +25,6 @@ export class PlaceComponent implements OnDestroy {
   private likes: DistributedCounter;
   private sub: Subscription;
   private data: dbPlace;
-
   
   get me() { return this.guard.userId || 'unknown'; }
   get name() { return !!this.data && this.data.name || ''; }
@@ -35,33 +32,32 @@ export class PlaceComponent implements OnDestroy {
   get favorite() { return this._favorite$.value; }
   get authenticated() { return this.guard.authenticated; }
 
-  constructor(private guard: AuthGuard, private db: DatabaseService) {}
+  constructor(private guard: AuthGuard, db: DatabaseService) { 
+    super(db, null)//Constructs the document with a null reference
+  }
 
   @HostBinding('style.background-image') 
-  private get photoUrl() {
-
-    return !!this.photo ? `url(${this.photo}?q=75&fm=jpg&w=400&fit=max)` : '';
-  }
+  private get photoUrl() { return !!this.photo ? `url(${this.photo}?q=75&fm=jpg&w=400&fit=max)` : ''; }
 
   @Input() set place(data: dbPlace) { 
 
     console.log('Place:', data.name);
 
-    // Gets a reference to the document in the DB
-    this.document = this.db.document<dbPlace>(`places/${data.id}`);
+    // Assosiates the document DB reference with this DatabaseDocument instance 
+    this.ref = this.db.doc(`places/${data.id}`);
     
     // Unsubscribes previous subscriptions, eventually
     if(!!this.sub) { this.sub.unsubscribe(); }
     
     // Streams the data content starting from the known set
-    this.sub = this.document.stream().pipe( startWith(data) )
+    this.sub = this.stream().pipe( startWith(data) )
       .subscribe( data => this.data = data );  
 
     // Gets the likes distributed counter
-    this.likes = this.document.counter('likes');
+    this.likes = this.counter('likes');
     
      // Gets the collection of likers
-    this.likers = this.document.collection('likers');
+    this.likers = this.collection('likers');
     
     // Builds the favorite flag
     this.favorite$ = this.initFavorite();   
@@ -98,21 +94,6 @@ export class PlaceComponent implements OnDestroy {
       // Returns true if such document exists
       .pipe( map( docs => docs.length > 0 ) );
   }
-
-  /** Updates the favorite status */
-  private updateFavorite(favorite: boolean, user: string) {
-
-    // Updates the local favorite flag copy for improved reactivity
-    this._favorite$.next(favorite);
-
-    // Adds the user to the collection of likers....
-    if(favorite) { this.likers.document(user).set({}); }
-    // ...or removes it according to the request
-    else { this.likers.document(user).delete(); }
-
-    // Updates the likes counter accordingly
-    this.likes.update( favorite ? 1 : -1 );
-  }
   
   /** Toggles the favorite status */
   public toggleFavorite() {
@@ -134,5 +115,20 @@ export class PlaceComponent implements OnDestroy {
 
       ).toPromise();
     });}
+  }
+
+  /** Updates the favorite status */
+  private updateFavorite(favorite: boolean, user: string) {
+
+    // Updates the local favorite flag copy for improved reactivity
+    this._favorite$.next(favorite);
+
+    // Adds the user to the collection of likers....
+    if(favorite) { this.likers.document(user).set({}); }
+    // ...or removes it according to the request
+    else { this.likers.document(user).delete(); }
+
+    // Updates the likes counter accordingly
+    this.likes.update( favorite ? 1 : -1 );
   }
 }
