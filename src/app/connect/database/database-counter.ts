@@ -1,11 +1,11 @@
 import { DatabaseService, dbCollectionRef } from './database.service';
 import { DatabaseCollection } from './database-collection';
+import { dbCommon } from './database-document';
 import { Observable, BehaviorSubject, merge } from 'rxjs';
 import { map, tap, distinctUntilChanged } from 'rxjs/operators';
 
-interface CounterShard {
-  count : number,
-  id?   : string
+interface CounterShard extends dbCommon {
+  count : number
 }
 
 /** Implements a DistributedCounter extending a DatabaseCollection */
@@ -55,23 +55,6 @@ export class DistributedCounter extends DatabaseCollection<CounterShard> {
     return batch.commit();
   }
 
-  // Updates a given shard in an atomic transaction
-  private updateShard(shard: string, increment: number): Promise<void> {
-    // Uses firestore references directly
-    const ref = this.ref.doc(shard);
-    // Runs a transaction to increment the given shard
-    return this.db.transaction( trx => {
-      return trx.get(ref).then( doc => {
-        // Reads the shard, when existing, falling back to {}
-        const data = doc.data() || {};
-        // Computes the new count value
-        const count = (data.count || 0) + increment;
-        // Updates the existing shard or creates a new one
-        trx.set(ref, { count });
-      });
-    })
-  }
-
   /** Updates the counter by the given increment (or decrement) */
   public update(increment: number): Promise<void> {
     // Updates the local copy first to improve reactivity
@@ -88,5 +71,22 @@ export class DistributedCounter extends DatabaseCollection<CounterShard> {
       // Or create the counter if needed
       return this.create(increment);
     });
+  }
+
+  // Updates a given shard in an atomic transaction
+  private updateShard(shard: string, increment: number): Promise<void> {
+    // Uses firestore references directly
+    const ref = this.ref.doc(shard);
+    // Runs a transaction to increment the given shard
+    return this.db.transaction( trx => {
+      return trx.get(ref).then( snap => {
+        // Reads the shard, when existing, falling back to {}
+        const data = snap.data() || {};
+        // Computes the new count value
+        const count = (data.count || 0) + increment;
+        // Updates the existing shard or creates a new one
+        trx.set(ref, { count });
+      });
+    })
   }
 }
