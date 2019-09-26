@@ -26,11 +26,16 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
   private sub: Subscription;
   private data: dbPlace;
   
-  get me() { return this.guard.userId || 'unknown'; }
-  get name() { return !!this.data && this.data.name || ''; }
-  get photo() { return !!this.data && this.data.photo || ''; }
-  get favorite() { return this._favorite$.value; }
-  get authenticated() { return this.guard.authenticated; }
+  /** Returns the current authenticated userId or 'unknown' */
+  get me(): string { return this.guard.userId || 'unknown'; }
+  /** Returns the place name */
+  get name(): string { return !!this.data && this.data.name || ''; }
+  /** Returns the place photo url */
+  get photo(): string { return !!this.data && this.data.photo || ''; }
+  /** Returns true thenever the place is favorite */
+  get favorite(): boolean { return this._favorite$.value; }
+  /** Returns true whenever the current user is authenticated */
+  get authenticated(): boolean { return this.guard.authenticated; }
 
   constructor(private guard: AuthGuard, db: DatabaseService) { 
     super(db, null)//Constructs the document with a null reference
@@ -63,6 +68,7 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
     this.favorite$ = this.initFavorite();   
  }
 
+  // Disposes of the observable subscriptions
   ngOnDestroy() { !!this.sub && this.sub.unsubscribe(); }
 
   /** Builds the favorite flag Observable */
