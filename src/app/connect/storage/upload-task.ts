@@ -1,5 +1,5 @@
 import { stUploadTask, stUploadTaskSnapshot } from './storage.service';
-import { Observable } from 'rxjs';
+import { Observable, Observer, Subscriber } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export class UploadTask {
@@ -17,10 +17,10 @@ export class UploadTask {
   constructor(readonly task: stUploadTask) {
 
     // Builds the uploading progress observable.
-    this.snapshot$ = new Observable(subscriber => task.on('state_changed', 
+    this.snapshot$ = new Observable(subscriber => task.on('state_changed',
       snap => subscriber.next(snap),
       error => subscriber.error(error),
-      () => subscriber.complete()
+      () => subscriber.complete() 
     ));
 
     this.progress$ = this.snapshot$.pipe( map(s => s.bytesTransferred / s.totalBytes * 100) );

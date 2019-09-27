@@ -6,12 +6,12 @@ export class StorageReference {
 
   constructor(readonly st: StorageService, public ref: stReference) {}
 
-  /** Returns a reference to a child item */
+  /** Returns a child StorageReference object */
   public child(path: string): StorageReference { 
     return this.st.ref( this.ref.child(path) ); 
   }
 
-  //-- Reverts back to the original firebase API since there's no advantages from AngularFireStorage implementation
+  //-- Reverts back to the original Primise-based storage API
 
   /** Returns the URL to download the file from */
   public getDownloadURL(): Promise<string> { 
@@ -45,7 +45,7 @@ export class StorageReference {
     return this.ref.listAll();
   }
 
-  //-- Wraps uploading functionalities taking advantage from AngularFireStorageReference implementation
+  //-- Wraps uploading functionalities with UploadTask class
 
   /** Creates an upload task for binary data */
   public put(data: Blob|Uint8Array|ArrayBuffer, metadata?: stUploadMetadata): UploadTask {
