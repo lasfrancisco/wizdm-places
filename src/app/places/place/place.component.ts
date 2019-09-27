@@ -37,7 +37,7 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
     super(db, null)//Constructs the document with a null reference
   }
 
-   @HostBinding('style.background-image') 
+  @HostBinding('style.background-image') 
   private get photoUrl() { return `url(${this.photo})`; }
 
   @Input() set place(data: dbPlace) { 
