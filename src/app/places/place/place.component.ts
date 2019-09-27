@@ -1,14 +1,10 @@
 import { Component, OnDestroy,  Input, HostBinding } from '@angular/core';
-import { AuthService, User, DatabaseService, DatabaseDocument, DatabaseCollection, DistributedCounter, dbCommon, dbTimestamp } from '../../connect';
+import { DatabaseService, DatabaseDocument, DatabaseCollection, DistributedCounter } from '../../connect';
 import { AuthGuard } from '../../utils/auth-guard.service';
 import { filter, map, tap, take, switchMap, takeUntil, startWith, distinctUntilChanged  } from 'rxjs/operators';
 import { Observable, BehaviorSubject, Subscription, merge, of } from 'rxjs';
+import { dbPlace } from '../places.component';
 import { $animations } from './place.animations';
-
-export interface dbPlace extends dbCommon {
-  name:  string;
-  photo?: string;
-};
 
 @Component({
   selector: 'wm-place',
@@ -21,7 +17,7 @@ export class PlaceComponent extends DatabaseDocument<dbPlace> implements OnDestr
   private _favorite$ = new BehaviorSubject<boolean>(false);
   private favorite$: Observable<boolean>;
 
-  private likers: DatabaseCollection<dbCommon>;
+  private likers: DatabaseCollection<any>;
   private likes: DistributedCounter;
   private sub: Subscription;
   private data: dbPlace;

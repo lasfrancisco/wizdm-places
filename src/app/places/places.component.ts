@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { DatabaseService, DatabaseCollection } from '../connect';
-import { dbPlace } from './place/place.component';
+import { DatabaseService, DatabaseCollection, dbCommon } from '../connect';
 import { Observable } from 'rxjs';
+
+export interface dbPlace extends dbCommon {
+  name:  string;
+  photo?: string;
+};
 
 @Component({
   selector: 'wm-places',
